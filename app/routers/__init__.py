@@ -8,7 +8,11 @@ from app.config import get_settings
 
 template_env = Environment(loader = FileSystemLoader("app/templates",), )
 template_env.globals['get_flashed_messages'] = get_flashed_messages
-templates = Jinja2Templates(env=template_env)
+templates = Jinja2Templates(directory="app/templates")
+try:
+    templates.env.globals["get_flashed_messages"] = get_flashed_messages
+except NameError:
+    templates.env.globals["get_flashed_messages"] = lambda request: []
 static_files = StaticFiles(directory="app/static")
 
 router = APIRouter(tags=["Jinja Based Endpoints"], include_in_schema=get_settings().env.lower() in ["dev","development"])

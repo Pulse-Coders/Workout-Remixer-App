@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Remixer</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        /* Navigation Bar */
+        header {
+            background-color: #fff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ddd;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .search-bar {
+            padding: 8px 15px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+        }
+        .auth-buttons button {
+            padding: 8px 15px;
+            margin-left: 10px;
+            border: 1px solid #333;
+            background: #e0e0e0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Sidebar Filters */
+        .sidebar {
+            width: 250px;
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+        .sidebar h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .filter-group {
+            margin-bottom: 20px;
+        }
+        .filter-group h4 {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        /* Workout Grid */
+        .main-content {
+            flex-grow: 1;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-image {
+            height: 150px;
+            background-color: #eaeaea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            border-bottom: 1px solid #ddd;
+        }
+        .card-content {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-content span {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .card-btn {
+            padding: 5px 10px;
+            background: #e0e0e0;
+            border: 1px solid #999;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Chatbot FAB (Floating Action Button) */
+        .chatbot-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">LOGO TITLE</div>
+        <input type="text" class="search-bar" placeholder="🔍 search for routine/workout">
+        <div class="auth-buttons">
+            <button>Login</button>
+            <button>Sign up</button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <aside class="sidebar">
+            <h3>Filter</h3>
+            
+            <div class="filter-group">
+                <h4>Type:</h4>
+                <label><input type="radio" name="type" checked> Workout (selected)</label>
+                <label><input type="radio" name="type"> Routine</label>
+            </div>
+
+            <div class="filter-group">
+                <h4>Muscle group:</h4>
+                <label><input type="radio" name="muscle"> Chest</label>
+                <label><input type="radio" name="muscle"> Back</label>
+                <label><input type="radio" name="muscle"> Shoulders</label>
+                <label><input type="radio" name="muscle"> Arms</label>
+                <label><input type="radio" name="muscle"> Legs</label>
+                <label><input type="radio" name="muscle"> Core</label>
+            </div>
+
+            <div class="filter-group">
+                <h4>Equipment:</h4>
+                <label><input type="radio" name="equip" checked> Dumbbells</label>
+                <label><input type="radio" name="equip"> Kettlebells</label>
+                <label><input type="radio" name="equip"> Barbells & Plates</label>
+            </div>
+            
+            </aside>
+
+        <main class="main-content">
+            <div class="grid">
+                <script>
+                    for(let i=0; i<12; i++) {
+                        document.write(`
+                        <div class="card">
+                            <div class="card-image">Image goes here</div>
+                            <div class="card-content">
+                                <span>Title of workout/routine</span>
+                                <button class="card-btn">view</button>
+                            </div>
+                        </div>
+                        `);
+                    }
+                </script>
+            </div>
+        </main>
+    </div>
+
+    <button class="chatbot-btn">🤖</button>
+
+</body>
+</html>

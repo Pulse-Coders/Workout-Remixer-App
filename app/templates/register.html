@@ -1,102 +1,47 @@
 {% extends "base.html" %}
-{% block title %}Register{% endblock %}
-
-{% block external_js %}
-
-{% endblock %}
+{% block title %}Sign Up - Workout Remixer{% endblock %}
 
 {% block internal_css %}
 <style>
-    body {
-        background-color: #f8f9fa;
-    }
-
-    .login-container {
-        min-height: 100vh;
-    }
-
-    .login-card {
-        border: none;
-        border-radius: 1rem;
-        overflow: hidden;
-    }
-
-    .login-image {
-        background: linear-gradient(135deg, #0d6efd, #0dcaf0);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        padding: 3rem;
-    }
-
-    .form-section {
-        padding: 3rem;
-    }
-
-    .btn-primary {
-        border-radius: 0.5rem;
-    }
-
-    .form-control {
-        border-radius: 0.5rem;
-    }
+    .auth-container { display: flex; justify-content: center; align-items: center; min-height: 80vh; background-color: #f5f6f8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .auth-box { background: #ffffff; padding: 40px; width: 350px; text-align: center; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .auth-box h2 { color: #1a1a1a; margin-bottom: 5px; font-weight: 800; letter-spacing: 1px; }
+    .auth-form { display: flex; flex-direction: column; text-align: left; }
+    .auth-form label { margin-top: 15px; font-weight: 600; font-size: 13px; color: #555; }
+    .auth-form input { padding: 12px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 6px; background-color: #fafafa; transition: border-color 0.2s; }
+    .auth-form input:focus { outline: none; border-color: #1a1a1a; }
+    .auth-btn { margin-top: 30px; padding: 12px; background-color: #1a1a1a; color: #ffffff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
+    .auth-btn:hover { background-color: #333333; }
+    .auth-links { margin-top: 25px; font-size: 13px; color: #666; }
+    .auth-links a { color: #1a1a1a; font-weight: bold; text-decoration: none; }
+    .auth-links a:hover { text-decoration: underline; }
 </style>
 {% endblock %}
 
-
 {% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <h2>SIGN UP</h2>
+        
+        {% for message in get_flashed_messages(request) %}
+            <div class="alert alert-danger" style="color: #d93025; background: #fce8e6; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px;">{{ message }}</div>
+        {% endfor %}
 
-<div class="container login-container d-flex align-items-center justify-content-center">
-    <div class="card shadow-lg login-card col-lg-10">
-        <div class="row g-0">
-            <div class="col-lg-6 d-none d-lg-flex login-image">
-                <div class="text-center">
-                    <h2 class="mt-4 fw-bold">Registration</h2>
-                    <p class="lead">Create an account for the app</p>
-                </div>
-            </div>
-            <div class="col-lg-6 bg-white">
-                <div class="form-section">
-                    <h3 class="fw-bold mb-4">Register</h3>
+        <form class="auth-form" action="/register" method="POST">
+            <label>Username</label>
+            <input type="text" name="username" required>
+            
+            <label>Email</label>
+            <input type="email" name="email" required>
 
-                    <form id="signUpForm" method="POST">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control form-control-md" id="username" name="username"
-                                required="required">
-                        </div>
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Email</label>
-                            <input type="email" class="form-control form-control-md" id="email" name="email"
-                                required="required">
-                        </div>
+            <label>Password</label>
+            <input type="password" name="password" required>
+            
+            <button type="submit" class="auth-btn">Create Account</button>
+        </form>
 
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control form-control-md" id="password" name="password"
-                                required>
-                        </div>
-
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                Register
-                            </button>
-                        </div>
-
-                        <div class="d-grid mb-3">
-                            <a class="btn btn-secondary btn-lg" href="{{url_for('login_view')}}" role="button">
-                                Back to Login
-                            </a>
-                        </div>
-                        {% for message in get_flashed_messages(request) %}
-                        <div class="alert alert-{{ message.type }}" role="alert">{{ message.message }}</div>
-                        {% endfor %}
-                    </form>
-
-                </div>
-            </div>
-
+        <div class="auth-links">
+            Already have an account? <a href="/login">Login</a>
         </div>
     </div>
 </div>

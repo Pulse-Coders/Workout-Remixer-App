@@ -1,3 +1,5 @@
+from urllib import request
+
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi import Request, status, Form, HTTPException
 from app.dependencies import SessionDep
@@ -10,10 +12,7 @@ from . import router, templates
 # View route (loads the page)
 @router.get("/register", response_class=HTMLResponse)
 async def register_view(request: Request):
-    return templates.TemplateResponse(
-        request=request, 
-        name="register.html",
-    )
+    return templates.TemplateResponse("register.html", {"request": request})
 
 # Action route (performs an action)
 @router.post('/register', response_class=HTMLResponse, status_code=status.HTTP_201_CREATED)

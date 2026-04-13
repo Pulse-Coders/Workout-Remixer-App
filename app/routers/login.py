@@ -1,5 +1,6 @@
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi import Request, status, Form
+from httpx import request
 from app.dependencies import SessionDep
 from . import router, templates
 from app.services.auth_service import AuthService
@@ -10,10 +11,7 @@ from app.config import get_settings
 # View route responsible for UI
 @router.get("/login", response_class=HTMLResponse)
 async def login_view(request: Request):
-    return templates.TemplateResponse(
-        request=request, 
-        name="login.html",
-    )
+    return templates.TemplateResponse("login.html", {"request": request})
 
 #Action route responsible for actually logging in the person
 @router.post("/login", response_class=HTMLResponse)
