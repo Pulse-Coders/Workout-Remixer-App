@@ -12,10 +12,11 @@ async def admin_home_view(
     user: AdminDep,
     db:SessionDep
 ):
+    
+@router.get("/admin", response_class=HTMLResponse)
+async def admin_home_view(request: Request, user: AdminDep, db:SessionDep):
     return templates.TemplateResponse(
         request=request, 
         name="admin.html",
-        context={
-            "user": user
-        }
+        context={"user": user}
     )

@@ -13,7 +13,10 @@ async def user_home_view(
     db:SessionDep
 ):
 
+@router.get("/app", response_class=HTMLResponse)
+async def user_home_view(request: Request, user: AuthDep, db:SessionDep):
     return templates.TemplateResponse(
-            name="user_home.html", 
-            context={"request": request, "user": user}
+        request=request,
+        name="user_home.html", 
+        context={"user": user}
     )
