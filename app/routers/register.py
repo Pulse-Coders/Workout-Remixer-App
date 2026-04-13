@@ -1,5 +1,3 @@
-from urllib import request
-
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi import Request, status, Form, HTTPException
 from app.dependencies import SessionDep
@@ -9,7 +7,6 @@ from app.repositories.user import UserRepository
 from app.utilities.flash import flash
 from . import router, templates
 
-# View route (loads the page)
 @router.get("/register", response_class=HTMLResponse)
 async def register_view(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
