@@ -11,5 +11,5 @@ async def admin_home_view(
     user: AdminDep,
     db: SessionDep
 ):
-    
-    return templates.TemplateResponse("admin.html", {"request": request, "user": user})
+    content = templates.get_template("admin.html").render({"request": request, "user": user})
+    return HTMLResponse(content=content)

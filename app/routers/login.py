@@ -5,10 +5,13 @@ from . import router, templates
 from app.services.auth_service import AuthService
 from app.repositories.user import UserRepository
 from app.utilities.flash import flash
+from fastapi import Request
+from fastapi.responses import HTMLResponse
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_view(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    content = templates.get_template("login.html").render({"request": request})
+    return HTMLResponse(content=content)
 
 @router.post("/login", response_class=HTMLResponse)
 async def login_action_ajax(

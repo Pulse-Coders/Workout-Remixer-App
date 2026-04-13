@@ -12,6 +12,10 @@ authors = [
     { name = "Kwasi Edwards", email = "kwasiedwards@gmail.com" }
 ]
 dependencies = [
+    "fastapi[all]==0.135.3",
+    "starlette==1.0.0",
+    "sqlmodel",
+    "uvicorn[standard]",
     "asyncpg",
     "fastapi[all]",
     "httpx",

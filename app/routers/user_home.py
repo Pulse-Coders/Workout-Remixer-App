@@ -6,10 +6,6 @@ from app.dependencies.auth import AuthDep, IsUserLoggedIn, get_current_user, is_
 from . import router, templates
 
 @router.get("/app", response_class=HTMLResponse)
-async def user_home_view(
-    request: Request,
-    user: AuthDep,
-    db: SessionDep
-):
-    
-    return templates.TemplateResponse("user_home.html", {"request": request, "user": user})
+async def user_home_view(request: Request, user: AuthDep, db: SessionDep):
+    content = templates.get_template("user_home.html").render({"request": request, "user": user})
+    return HTMLResponse(content=content)
