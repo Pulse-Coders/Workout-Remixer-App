@@ -11,13 +11,8 @@ from app.config import get_settings
 # View route responsible for UI
 @router.get("/login", response_class=HTMLResponse)
 async def login_view(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="login.html", 
-        context={}
-    )
+    return templates.TemplateResponse("login.html", {"request": request})
 
-#Action route responsible for actually logging in the person
 @router.post("/login", response_class=HTMLResponse)
 async def login_action_ajax(
     db: SessionDep,
