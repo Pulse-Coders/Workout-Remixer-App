@@ -90,7 +90,9 @@
         <h2>LOGIN</h2>
         
         {% for message in get_flashed_messages(request) %}
-            <div class="alert alert-danger" style="color: #d93025; background: #fce8e6; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px;">{{ message }}</div>
+            <div class="alert alert-{{ message.type }}">
+                {{ message.message }} 
+            </div>
         {% endfor %}
 
         <form class="auth-form" action="/login" method="POST">
