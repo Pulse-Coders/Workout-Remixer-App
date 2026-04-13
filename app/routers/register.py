@@ -12,7 +12,10 @@ from . import router, templates
 # View route (loads the page)
 @router.get("/register", response_class=HTMLResponse)
 async def register_view(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
+    return templates.TemplateResponse(
+        name="register.html", 
+        context={"request": request}
+    ) 
 
 # Action route (performs an action)
 @router.post('/register', response_class=HTMLResponse, status_code=status.HTTP_201_CREATED)
