@@ -1,4 +1,4 @@
-from fastapi import Request, HTTPException
+from fastapi import Request, HTTPException, status
 from pydantic import BaseModel
 from sqlmodel import select
 
@@ -52,7 +52,7 @@ async def trigger_seed():
     except Exception as e:
         return {"error": str(e)}
 
-# --- AI CHATBOT (LANCHAIN) ---
+# --- AI CHATBOT (LANGCHAIN) ---
 @api_router.post("/chat")
 async def ai_chat_endpoint(chat_msg: ChatMessage):
     try:

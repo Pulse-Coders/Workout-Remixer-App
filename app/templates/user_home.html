@@ -93,8 +93,9 @@
             <div class="grid">
                 <div class="card" v-for="workout in filteredWorkouts" :key="workout.id">
                     <div class="card-image">
+                        <img v-if="workout.image_url" :src="workout.image_url" :alt="workout.name" style="width:100%; height:100%; object-fit:cover;">
+                        <span v-else>[[ workout.name.charAt(0) ]]</span>
                         <span class="card-tag">#[[ workout.muscle_group ]]</span>
-                        [[ workout.name.charAt(0) ]]
                     </div>
                     <div class="card-content">
                         <h4 class="card-title">[[ workout.name ]]</h4>
@@ -142,12 +143,11 @@
             const workouts = ref([])
             const currentRoutine = ref([])
             const savedRoutines = ref([])
-            const isEditing = ref(null) // Tracks index of routine being edited
+            const isEditing = ref(null) 
             
             const selectedMuscles = ref(["Chest", "Back", "Legs", "Shoulders"])
             const selectedDifficulty = ref("")
 
-            // --- FILTERING (Req #1) ---
             const filteredWorkouts = computed(() => {
                 return workouts.value.filter(w => {
                     const mMatch = selectedMuscles.value.length === 0 || selectedMuscles.value.includes(w.muscle_group);
@@ -156,7 +156,6 @@
                 });
             })
 
-            // --- ROUTINE ACTIONS (Req #2, #3, #4) ---
             const addToBuilder = (workout) => {
                 currentRoutine.value.push({...workout});
                 showToast("Added", `${workout.name} added to builder.`);
@@ -185,7 +184,6 @@
             }
 
             const editSavedRoutine = (index) => {
-                // Load saved routine back into the active builder for editing
                 currentRoutine.value = [...savedRoutines.value[index].exercises];
                 isEditing.value = index;
                 showToast("Editing", "Loaded routine into builder.");
@@ -196,7 +194,6 @@
                 showToast("Deleted", "Routine removed.");
             }
 
-            // --- API ACTIONS ---
             const loadWorkouts = async () => {
                 const res = await fetch('/api/workouts');
                 workouts.value = await res.json();
@@ -210,7 +207,6 @@
                 showToast("Remixed", "Found a similar exercise!");
             }
 
-            // --- UTILS ---
             const showToast = (title, msg) => {
                 const tEl = document.getElementById('appToast');
                 if (tEl) {
@@ -220,7 +216,6 @@
                 }
             }
 
-            // --- CHATBOT ---
             const isChatOpen = ref(false)
             const chatMessages = ref([{ role: 'bot', text: 'How can I help with your routine today?' }])
             const newMsg = ref('')
@@ -231,7 +226,8 @@
                 const userText = newMsg.value;
                 newMsg.value = '';
                 await nextTick();
-                document.getElementById('chat-box').scrollTop = 9999;
+                const box = document.getElementById('chat-box');
+                if(box) box.scrollTop = 9999;
 
                 try {
                     const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: userText }) });
@@ -239,7 +235,7 @@
                     chatMessages.value.push({ role: 'bot', text: data.reply });
                 } catch (e) { chatMessages.value.push({ role: 'bot', text: 'Error connecting to AI.' }); }
                 await nextTick();
-                document.getElementById('chat-box').scrollTop = 9999;
+                if(box) box.scrollTop = 9999;
             }
 
             onMounted(loadWorkouts)
