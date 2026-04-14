@@ -7,7 +7,6 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URI")
 engine = create_engine(DATABASE_URL)
 
-# Map workout name to image filename
 sample_workouts = [
     Workout(
         name="Dumbbell Flyes",
@@ -41,11 +40,10 @@ sample_workouts = [
         instructions="Press dumbbells overhead from shoulders.",
         image_url="/static/img/workouts/shoulder_press.jpg"
     ),
-    # Add more as needed
 ]
 
 with Session(engine) as session:
     for w in sample_workouts:
         session.add(w)
     session.commit()
-    print(f"Added {len(sample_workouts)} workouts with image URLs.")
+    print(f"Added {len(sample_workouts)} workouts.")

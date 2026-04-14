@@ -89,48 +89,59 @@
 </style>
 
 <script>
-const { createApp, ref, nextTick } = Vue
-createApp({
-    compilerOptions: { delimiters: ["[[", "]]"] },
-    setup() {
-        const isOpen = ref(false)
-        const userInput = ref("")
-        const loading = ref(false)
-        const msgBox = ref(null)
-        const messages = ref([
-            { role: "assistant", content: "Hey! I'm FitBot 💪 Ask me about workouts, routines, or anything fitness-related!" }
-        ])
-        const toggleChat = () => { isOpen.value = !isOpen.value }
-        const scrollToBottom = async () => {
-            await nextTick()
-            if (msgBox.value) msgBox.value.scrollTop = msgBox.value.scrollHeight
-        }
-        const sendMessage = async () => {
-            const text = userInput.value.trim()
-            if (!text || loading.value) return
-            messages.value.push({ role: "user", content: text })
-            userInput.value = ""
-            loading.value = true
-            await scrollToBottom()
-            try {
-                const history = messages.value.slice(1).map(m => ({ role: m.role, content: m.content }))
+    (function() {
+      function init() {
+        const { createApp, ref, nextTick } = Vue;
+        const app = createApp({
+          compilerOptions: { delimiters: ['[[', ']]'] },
+          setup() {
+            const isOpen = ref(false);
+            const userInput = ref("");
+            const loading = ref(false);
+            const msgBox = ref(null);
+            const messages = ref([
+              { role: "assistant", content: "Hey! I'm FitBot 💪 Ask me about workouts, routines, or anything fitness-related!" }
+            ]);
+            const toggleChat = () => { isOpen.value = !isOpen.value; };
+            const scrollToBottom = async () => {
+              await nextTick();
+              if (msgBox.value) msgBox.value.scrollTop = msgBox.value.scrollHeight;
+            };
+            const sendMessage = async () => {
+              const text = userInput.value.trim();
+              if (!text || loading.value) return;
+              messages.value.push({ role: "user", content: text });
+              userInput.value = "";
+              loading.value = true;
+              await scrollToBottom();
+              try {
+                const history = messages.value.slice(1).map(m => ({ role: m.role, content: m.content }));
                 const res = await fetch("/api/chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ messages: history })
-                })
-                const data = await res.json()
-                messages.value.push({ role: "assistant", content: data.reply })
-            } catch (e) {
-                messages.value.push({ role: "assistant", content: "Sorry, something went wrong. Try again!" })
-            }
-            loading.value = false
-            await scrollToBottom()
-        }
-        return { isOpen, userInput, loading, messages, msgBox, toggleChat, sendMessage }
-    }
-}).mount('#chatbot-app')
-</script>
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ messages: history })
+                });
+                const data = await res.json();
+                messages.value.push({ role: "assistant", content: data.reply });
+              } catch (e) {
+                console.error(e);
+                messages.value.push({ role: "assistant", content: "Sorry, something went wrong. Try again!" });
+              }
+              loading.value = false;
+              await scrollToBottom();
+            };
+            return { isOpen, userInput, loading, messages, msgBox, toggleChat, sendMessage };
+          }
+        });
+        app.mount('#chatbot-app');
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
 </body>
 
 </html>

@@ -71,8 +71,8 @@
             <div class="grid">
                 <div class="card" v-for="workout in filteredWorkouts" :key="workout.id">
                     <div class="card-image">
+                        <img :src="workout.image_url" :alt="workout.name" style="width:100%; height:100%; object-fit:cover;">
                         <span class="card-tag">#[[ workout.muscle_group ]]</span>
-                        Workout Preview
                     </div>
                     <div class="card-content">
                         <div class="card-header-info">
