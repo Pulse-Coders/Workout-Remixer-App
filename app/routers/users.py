@@ -16,21 +16,18 @@ from app.utilities.seed import seed_database
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
-# ==========================================
-# USER MANAGEMENT ENDPOINTS
-# ==========================================
+# --- SCHEMAS ---
+class ChatMessage(BaseModel):
+    message: str
 
+# --- USER MANAGEMENT ---
 @api_router.get("/users", response_model=list[UserResponse])
 async def list_users(request: Request, db: SessionDep):
     user_repo = UserRepository(db)
     user_service = UserService(user_repo)
     return user_service.get_all_users()
 
-
-# ==========================================
-# WORKOUT & REMIX ENDPOINTS
-# ==========================================
-
+# --- WORKOUTS & REMIX LOGIC ---
 @api_router.get("/workouts")
 async def get_all_workouts(db: SessionDep):
     workouts = db.exec(select(Workout)).all()
@@ -46,11 +43,7 @@ async def remix_exercise(workout_id: int, db: SessionDep):
 
     return new_workout
 
-
-# ==========================================
-# DATABASE UTILITIES
-# ==========================================
-
+# --- DATABASE UTILITIES ---
 @api_router.get("/trigger-seed")
 async def trigger_seed():
     try:
@@ -59,21 +52,15 @@ async def trigger_seed():
     except Exception as e:
         return {"error": str(e)}
 
-
-# ==========================================
-# AI CHATBOT INTEGRATION
-# ==========================================
-
-class ChatMessage(BaseModel):
-    message: str
-
+# --- AI CHATBOT (LANCHAIN) ---
 @api_router.post("/chat")
 async def ai_chat_endpoint(chat_msg: ChatMessage):
     try:
         llm = ChatOpenAI(
             base_url="https://ai-gen.sundaebytestt.com/v1",
             api_key="sk-59addf63a8bd464c92242421db666aa1",
-            model="meta/llama-3.2-3b-instruct"
+            model="meta/llama-3.2-3b-instruct",
+            max_tokens=150
         )
         
         messages = [
