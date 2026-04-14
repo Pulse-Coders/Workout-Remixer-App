@@ -1,6 +1,7 @@
 from fastapi import Request, HTTPException, status
 from pydantic import BaseModel
 from sqlmodel import select
+from typing import List
 
 from app.dependencies.session import SessionDep 
 from . import api_router
@@ -16,9 +17,13 @@ from app.utilities.seed import seed_database
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
-# --- SCHEMAS ---
-class ChatMessage(BaseModel):
-    message: str
+# --- SCHEMAS FOR CONVERSATION HISTORY ---
+class Message(BaseModel):
+    role: str
+    content: str
+
+class ChatRequest(BaseModel):
+    messages: List[Message]
 
 # --- USER MANAGEMENT ---
 @api_router.get("/users", response_model=list[UserResponse])
@@ -52,35 +57,45 @@ async def trigger_seed():
     except Exception as e:
         return {"error": str(e)}
 
-# --- AI CHATBOT (LANGCHAIN) ---
+# --- CONSOLIDATED AI CHATBOT ---
 @api_router.post("/chat")
-async def ai_chat_endpoint(chat_msg: ChatMessage):
+async def ai_chat_endpoint(chat_data: ChatRequest):
     try:
-        # Try to connect to your class's custom LLM server
+        user_input = chat_data.messages[-1].content
+
         llm = ChatOpenAI(
-            base_url="https://ai-gen.sundaebytestt.com/v1",
+            base_url="https://ai-gen.sundaebytestt.com/",
             api_key="sk-59addf63a8bd464c92242421db666aa1",
             model="meta/llama-3.2-3b-instruct",
             max_tokens=150,
-            timeout=5.0 # Stop waiting after 5 seconds so the app doesn't freeze
+            timeout=15.0 
         )
+ 
+        messages = [SystemMessage(content="You are FitBot, a helpful fitness assistant. Keep answers under 3 sentences.")]
         
-        messages = [
-            SystemMessage(content="You are FitBot, a helpful, energetic, and concise fitness assistant. Keep answers under 3 sentences."),
-            HumanMessage(content=chat_msg.message)
-        ]
+        for m in chat_data.messages:
+            if m.role == "user":
+                messages.append(HumanMessage(content=m.content))
         
         response = await llm.ainvoke(messages)
         return {"reply": str(response.content)}
         
     except Exception as e:
-        print(f"⚠️ AI Server Error: {e}")
-        user_text = chat_msg.message.lower()
-        if "chest" in user_text or "push" in user_text:
-            return {"reply": "For a great chest workout, try combining Standard Push-ups with Dumbbell Bench Presses! Aim for 3 sets of 10."}
-        elif "leg" in user_text or "squat" in user_text:
-            return {"reply": "Never skip leg day! Barbell Squats and Lunges are the absolute best foundation for lower body strength."}
-        elif "level" in user_text or "xp" in user_text:
-            return {"reply": "You earn XP by building and saving routines! The harder the exercise Tier, the more XP you get. Keep grinding!"}
+        print(f"AI Connection Error: {e}")
+        user_text = chat_data.messages[-1].content.lower()
+        
+        def has_words(words):
+            return any(word in user_text for word in words)
+        
+        if has_words(["chest", "push up", "pushup"]):
+            return {"reply": "For your chest, focus on Standard Push-ups and Evolve them into Decline Push-ups as you gain strength!"}
+        elif has_words(["back", "pull up", "row"]):
+            return {"reply": "Try Bent-over Rows or Pull-ups for a stronger back. You can Simplify pull-ups by using a band!"}
+        elif has_words(["leg", "squat", "lunge"]):
+            return {"reply": "Bodyweight squats and lunges are a great foundation. Level them up once they feel too easy."}
+        elif has_words(["level", "xp", "rank"]):
+            return {"reply": "You earn XP by building and saving routines! Higher tier exercises give you more XP toward your next level."}
+        elif has_words(["hello", "hi", "hey"]):
+            return {"reply": "Hello! I'm FitBot. I'm currently in offline mode, but I can still help with basic workout advice. What's on your mind?"}
         else:
-            return {"reply": "I'm currently operating in offline mode! I can still recommend workouts if you ask me about specific muscles like 'chest', 'legs', or 'back'."}
+            return {"reply": "I'm having trouble connecting to the AI, but keep crushing those routines! Try asking about specific muscle groups like 'chest' or 'legs'."}
