@@ -11,5 +11,8 @@ class UserBase(SQLModel):
     xp: int = Field(default=0)
     level: int = Field(default=1)
 
+    xp: int = Field(default=0)
+    level: int = Field(default=1)
+
 class User(UserBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
