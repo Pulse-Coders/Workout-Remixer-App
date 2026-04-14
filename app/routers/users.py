@@ -56,3 +56,13 @@ async def remix_exercise(workout_id: int, db: SessionDep):
         raise HTTPException(status_code=404, detail="Workout not found")
         
     return new_workout
+
+from app.utilities.seed import seed_database
+
+@api_router.get("/trigger-seed")
+async def trigger_seed():
+    try:
+        seed_database()
+        return {"message": "Database successfully seeded!"}
+    except Exception as e:
+        return {"error": str(e)}
