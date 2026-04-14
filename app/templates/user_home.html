@@ -4,35 +4,40 @@
 {% block additional_styles %}
 <style>
     .dashboard-container { display: flex; gap: 30px; }
-    .sidebar { width: 280px; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: calc(100vh - 120px); overflow-y: auto; flex-shrink: 0;}
-    .sidebar h3 { margin-top: 0; color: #1a1a1a; font-weight: 800; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;}
+    .sidebar { width: 320px; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: calc(100vh - 120px); overflow-y: auto; flex-shrink: 0;}
+    .sidebar h3 { margin-top: 20px; color: #1a1a1a; font-weight: 800; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 15px;}
+    .sidebar h3:first-child { margin-top: 0; }
     
-    .filter-group { margin-bottom: 20px; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; }
-    .filter-group:last-child { border: none; }
-    .filter-group h4 { margin-bottom: 10px; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px;}
-    .filter-group label { display: block; margin-bottom: 6px; font-size: 14px; color: #333; cursor: pointer; transition: color 0.2s; }
-    .filter-group label:hover { color: #1a1a1a; }
+    .filter-group { margin-bottom: 15px; }
+    .filter-group h4 { margin-bottom: 8px; font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px;}
+    .filter-group label { display: block; margin-bottom: 5px; font-size: 14px; color: #333; cursor: pointer; }
     
     .main-content { flex-grow: 1; }
-    
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-    .card { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;}
-    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.1); }
+    .card { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; transition: 0.2s;}
+    .card:hover { transform: translateY(-4px); }
     
-    .card-image { height: 160px; background-color: #1a1a1a; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; position: relative; }
-    .card-tag { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); color: #1a1a1a; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+    .card-image { height: 140px; background-color: #1a1a1a; display: flex; align-items: center; justify-content: center; color: #fff; position: relative; }
+    .card-tag { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); color: #1a1a1a; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+    .card-content { padding: 15px; }
+    .card-title { font-size: 16px; font-weight: 800; margin: 0; }
+    .card-meta { font-size: 11px; color: #888; margin-bottom: 10px; display: flex; gap: 8px; }
+    
+    .card-footer { display: flex; gap: 8px; padding: 0 15px 15px 15px; }
+    .btn-outline { flex: 1; padding: 8px; border: 2px solid #1a1a1a; background: transparent; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
+    .btn-fill { flex: 1; padding: 8px; background: #1a1a1a; color: #fff; border: 2px solid #1a1a1a; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
 
-    .card-content { padding: 20px; }
-    .card-header-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-    .card-title { font-size: 18px; font-weight: 800; color: #1a1a1a; margin: 0; }
-    .card-meta { font-size: 12px; color: #888; margin-bottom: 15px; display: flex; gap: 10px; }
+    /* Routine Builder & Saved Lists */
+    .routine-box { background: #fdfdfd; border: 2px dashed #ddd; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+    .routine-item { background: #fff; padding: 8px 12px; border-radius: 6px; margin-bottom: 5px; display: flex; justify-content: space-between; border: 1px solid #eee; font-size: 12px; font-weight: 700; }
     
-    .card-footer { display: flex; gap: 10px; margin-top: auto; padding: 0 20px 20px 20px; }
-    .btn-outline { flex: 1; padding: 10px; border: 2px solid #1a1a1a; background: transparent; color: #1a1a1a; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; text-align: center; }
-    .btn-outline:hover { background: #1a1a1a; color: #fff; }
-    .btn-fill { flex: 1; padding: 10px; background: #1a1a1a; color: #fff; border: 2px solid #1a1a1a; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
-
+    .saved-routine-card { background: #1a1a1a; color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+    .saved-routine-card h5 { margin: 0; font-size: 14px; font-weight: 800; }
+    .saved-routine-card p { font-size: 11px; margin: 5px 0; color: #aaa; }
     
+    /* Chatbot Styles */
+    .chatbot-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #1a1a1a; color: #fff; border-radius: 50%; border: none; cursor: pointer; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 24px;}
+    .chatbot-window { position: fixed; bottom: 100px; right: 30px; width: 320px; height: 400px; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 1000; display: flex; flex-direction: column; overflow: hidden; }
 </style>
 {% endblock %}
 
@@ -42,28 +47,45 @@
         
         <aside class="sidebar">
             <h3>Refine</h3>
-            
             <div class="filter-group">
                 <h4>Muscle Group</h4>
-                <label><input type="checkbox" value="Chest" v-model="selectedMuscles"> Chest</label>
-                <label><input type="checkbox" value="Back" v-model="selectedMuscles"> Back</label>
-                <label><input type="checkbox" value="Legs" v-model="selectedMuscles"> Legs</label>
-                <label><input type="checkbox" value="Shoulders" v-model="selectedMuscles"> Shoulders</label>
+                <label v-for="m in ['Chest', 'Back', 'Legs', 'Shoulders']">
+                    <input type="checkbox" :value="m" v-model="selectedMuscles"> [[ m ]]
+                </label>
             </div>
-
             <div class="filter-group">
                 <h4>Difficulty</h4>
-                <label><input type="radio" value="" v-model="selectedDifficulty"> All</label>
-                <label><input type="radio" value="Beginner" v-model="selectedDifficulty"> Beginner</label>
-                <label><input type="radio" value="Intermediate" v-model="selectedDifficulty"> Intermediate</label>
-                <label><input type="radio" value="Advanced" v-model="selectedDifficulty"> Advanced</label>
+                <label><input type="radio" value="" v-model="selectedDifficulty"> All Levels</label>
+                <label v-for="d in ['Beginner', 'Intermediate', 'Advanced']">
+                    <input type="radio" :value="d" v-model="selectedDifficulty"> [[ d ]]
+                </label>
             </div>
 
-            <div class="filter-group">
-                <h4>Equipment</h4>
-                <label><input type="checkbox" value="Dumbbells" v-model="selectedEquipment"> Dumbbells</label>
-                <label><input type="checkbox" value="Barbell" v-model="selectedEquipment"> Barbell</label>
-                <label><input type="checkbox" value="Bodyweight" v-model="selectedEquipment"> Bodyweight</label>
+            <h3>Current Builder</h3>
+            <div class="routine-box">
+                <div v-if="currentRoutine.length === 0" class="text-center py-3 text-muted small">
+                    Click "Start" on a workout to add it here.
+                </div>
+                <div v-for="(item, idx) in currentRoutine" :key="idx" class="routine-item">
+                    [[ item.name ]]
+                    <span class="text-danger" style="cursor:pointer" @click="removeFromBuilder(idx)">✖</span>
+                </div>
+            </div>
+            <button v-if="currentRoutine.length > 0" class="btn-fill w-100" @click="saveRoutine">
+                [[ isEditing !== null ? 'Update Routine' : 'Create Routine' ]]
+            </button>
+
+            <h3>Saved Routines</h3>
+            <div v-if="savedRoutines.length === 0" class="text-muted small">No saved routines yet.</div>
+            <div v-for="(routine, index) in savedRoutines" :key="index" class="saved-routine-card">
+                <div class="d-flex justify-content-between">
+                    <h5>[[ routine.name ]]</h5>
+                    <div>
+                        <span style="cursor:pointer; margin-right: 10px;" @click="editSavedRoutine(index)">✏️</span>
+                        <span style="cursor:pointer; color: #ff4444;" @click="deleteRoutine(index)">🗑️</span>
+                    </div>
+                </div>
+                <p>[[ routine.exercises.length ]] exercises • [[ routine.date ]]</p>
             </div>
         </aside>
 
@@ -71,92 +93,158 @@
             <div class="grid">
                 <div class="card" v-for="workout in filteredWorkouts" :key="workout.id">
                     <div class="card-image">
-                        <img :src="workout.image_url" :alt="workout.name" style="width:100%; height:100%; object-fit:cover;">
+                        <img v-if="workout.image_url" :src="workout.image_url" :alt="workout.name" style="width:100%; height:100%; object-fit:cover;">
+                        <span v-else>[[ workout.name.charAt(0) ]]</span>
                         <span class="card-tag">#[[ workout.muscle_group ]]</span>
                     </div>
                     <div class="card-content">
-                        <div class="card-header-info">
-                            <h4 class="card-title">[[ workout.name ]]</h4>
-                        </div>
+                        <h4 class="card-title">[[ workout.name ]]</h4>
                         <div class="card-meta">
                             <span>⚡ [[ workout.difficulty ]]</span>
                             <span>🏋️ [[ workout.equipment ]]</span>
                         </div>
-                        <p style="font-size: 13px; color: #666; margin: 0;">[[ workout.instructions ]]</p>
                     </div>
                     <div class="card-footer">
                         <button class="btn-outline" @click="remixWorkout(workout.id)">🔀 Remix</button>
-                        <button class="btn-fill">Start</button>
+                        <button class="btn-fill" @click="addToBuilder(workout)">Start</button>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    
+    <button class="chatbot-btn" @click="toggleChat" v-if="!isChatOpen">🤖</button>
+    <div class="chatbot-window" v-if="isChatOpen">
+        <div class="bg-dark text-white p-3 d-flex justify-content-between">
+            <strong>FitBot</strong>
+            <span style="cursor:pointer" @click="toggleChat">✖</span>
+        </div>
+        <div class="flex-grow-1 p-3 bg-light overflow-auto" id="chat-box">
+            <div v-for="m in chatMessages" :class="['p-2 mb-2 rounded shadow-sm', m.role === 'user' ? 'bg-dark text-white ms-auto' : 'bg-white text-dark']" style="max-width: 80%; font-size: 12px;">
+                [[ m.text ]]
+            </div>
+        </div>
+        <div class="p-2 border-top d-flex">
+            <input type="text" class="form-control form-control-sm" v-model="newMsg" @keyup.enter="sendChat" placeholder="Ask a question...">
+            <button class="btn btn-dark btn-sm ms-2" @click="sendChat">Send</button>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block subpage_scripts %}
 <script>
-    const { createApp, ref, onMounted, computed } = Vue
+    const { createApp, ref, onMounted, computed, nextTick } = Vue
     
     createApp({
         compilerOptions: { delimiters: ["[[", "]]"] },
         setup() {
-            const isChatOpen = ref(false)
-            const toggleChat = () => { isChatOpen.value = !isChatOpen.value }
-
+            // --- DATA ---
             const workouts = ref([])
+            const currentRoutine = ref([])
+            const savedRoutines = ref([])
+            const isEditing = ref(null) 
             
             const selectedMuscles = ref(["Chest", "Back", "Legs", "Shoulders"])
             const selectedDifficulty = ref("")
-            const selectedEquipment = ref(["Dumbbells", "Barbell", "Bodyweight"])
 
             const filteredWorkouts = computed(() => {
                 return workouts.value.filter(w => {
-                    const matchMuscle = selectedMuscles.value.length === 0 || selectedMuscles.value.includes(w.muscle_group);
-                    const matchDiff = selectedDifficulty.value === "" || w.difficulty === selectedDifficulty.value;
-                    const matchEquip = selectedEquipment.value.length === 0 || selectedEquipment.value.includes(w.equipment);
-                    return matchMuscle && matchDiff && matchEquip;
+                    const mMatch = selectedMuscles.value.length === 0 || selectedMuscles.value.includes(w.muscle_group);
+                    const dMatch = selectedDifficulty.value === "" || w.difficulty === selectedDifficulty.value;
+                    return mMatch && dMatch;
                 });
             })
 
+            const addToBuilder = (workout) => {
+                currentRoutine.value.push({...workout});
+                showToast("Added", `${workout.name} added to builder.`);
+            }
+
+            const removeFromBuilder = (idx) => {
+                currentRoutine.value.splice(idx, 1);
+            }
+
+            const saveRoutine = () => {
+                const routineData = {
+                    name: `Routine #${savedRoutines.value.length + 1}`,
+                    date: new Date().toLocaleDateString(),
+                    exercises: [...currentRoutine.value]
+                };
+
+                if (isEditing.value !== null) {
+                    savedRoutines.value[isEditing.value] = routineData;
+                    isEditing.value = null;
+                    showToast("Updated", "Routine has been updated.");
+                } else {
+                    savedRoutines.value.push(routineData);
+                    showToast("Created", "Routine saved to your list.");
+                }
+                currentRoutine.value = [];
+            }
+
+            const editSavedRoutine = (index) => {
+                currentRoutine.value = [...savedRoutines.value[index].exercises];
+                isEditing.value = index;
+                showToast("Editing", "Loaded routine into builder.");
+            }
+
+            const deleteRoutine = (index) => {
+                savedRoutines.value.splice(index, 1);
+                showToast("Deleted", "Routine removed.");
+            }
+
             const loadWorkouts = async () => {
-                try {
-                    const response = await fetch('/api/workouts');
-                    if (!response.ok) throw new Error("Failed to load workouts");
-                    workouts.value = await response.json();
-                } catch (error) {
-                    console.error("Error loading workouts:", error);
+                const res = await fetch('/api/workouts');
+                workouts.value = await res.json();
+            }
+
+            const remixWorkout = async (id) => {
+                const res = await fetch(`/api/remix/${id}`);
+                const data = await res.json();
+                const idx = workouts.value.findIndex(w => w.id === id);
+                if (idx !== -1) workouts.value[idx] = data;
+                showToast("Remixed", "Found a similar exercise!");
+            }
+
+            const showToast = (title, msg) => {
+                const tEl = document.getElementById('appToast');
+                if (tEl) {
+                    document.getElementById('toastTitle').innerText = title;
+                    document.getElementById('toastContent').innerText = msg;
+                    new bootstrap.Toast(tEl).show();
                 }
             }
 
-            onMounted(() => {
-                loadWorkouts();
-            })
+            const isChatOpen = ref(false)
+            const chatMessages = ref([{ role: 'bot', text: 'How can I help with your routine today?' }])
+            const newMsg = ref('')
+            const toggleChat = () => { isChatOpen.value = !isChatOpen.value }
+            const sendChat = async () => {
+                if (!newMsg.value.trim()) return;
+                chatMessages.value.push({ role: 'user', text: newMsg.value });
+                const userText = newMsg.value;
+                newMsg.value = '';
+                await nextTick();
+                const box = document.getElementById('chat-box');
+                if(box) box.scrollTop = 9999;
 
-            const remixWorkout = async (currentWorkoutId) => {
                 try {
-                    const response = await fetch(`/api/remix/${currentWorkoutId}`);
-                    if (!response.ok) throw new Error("Remix failed");
-                    
-                    const newWorkout = await response.json();
-                    
-                    const mainIndex = workouts.value.findIndex(w => w.id === currentWorkoutId);
-                    if (mainIndex !== -1) {
-                        workouts.value[mainIndex] = newWorkout;
-                    }
-                    
-                } catch (error) {
-                    console.error("Error remixing:", error);
-                    alert("Could not remix this exercise.");
-                }
+                    const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: userText }) });
+                    const data = await res.json();
+                    chatMessages.value.push({ role: 'bot', text: data.reply });
+                } catch (e) { chatMessages.value.push({ role: 'bot', text: 'Error connecting to AI.' }); }
+                await nextTick();
+                if(box) box.scrollTop = 9999;
             }
+
+            onMounted(loadWorkouts)
 
             return { 
-                 workouts, remixWorkout,
-                selectedMuscles, selectedDifficulty, selectedEquipment, filteredWorkouts
+                workouts, filteredWorkouts, selectedMuscles, selectedDifficulty, 
+                currentRoutine, savedRoutines, isEditing,
+                addToBuilder, removeFromBuilder, saveRoutine, editSavedRoutine, deleteRoutine,
+                remixWorkout, isChatOpen, toggleChat, chatMessages, newMsg, sendChat 
             }
         }
     }).mount('#vue-app')
