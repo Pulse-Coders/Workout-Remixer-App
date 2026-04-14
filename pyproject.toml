@@ -32,6 +32,8 @@ dependencies = [
     "tabulate",
     "typer",
     "uvicorn[standard]",
+    "httpx",
+    "langchain-openai"
 ]
 [project.optional-dependencies]
 dev = [
