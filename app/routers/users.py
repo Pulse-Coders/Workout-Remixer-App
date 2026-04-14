@@ -1,9 +1,10 @@
 from fastapi import Request, HTTPException, status
 from pydantic import BaseModel
-from sqlmodel import select
+from sqlmodel import select, SQLModel # Added SQLModel for reset logic
 from typing import List
 
 from app.dependencies.session import SessionDep 
+from app.database import engine # Added engine for reset logic
 from . import api_router
 
 from app.services.user_service import UserService
@@ -57,6 +58,17 @@ async def trigger_seed():
     except Exception as e:
         return {"error": str(e)}
 
+# EMERGENCY RESET: Use this to fix the "UndefinedColumn" PostgreSQL error
+@api_router.get("/debug-db-reset")
+async def debug_db_reset():
+    try:
+        # This deletes OLD tables and creates NEW ones with all RPG columns
+        SQLModel.metadata.drop_all(engine)
+        SQLModel.metadata.create_all(engine)
+        return {"message": "Database wiped and rebuilt with new RPG columns! Your data is now clean."}
+    except Exception as e:
+        return {"error": str(e)}
+
 # --- CONSOLIDATED AI CHATBOT ---
 @api_router.post("/chat")
 async def ai_chat_endpoint(chat_data: ChatRequest):
@@ -64,7 +76,8 @@ async def ai_chat_endpoint(chat_data: ChatRequest):
         user_input = chat_data.messages[-1].content
 
         llm = ChatOpenAI(
-            base_url="https://ai-gen.sundaebytestt.com/",
+            # Added /v1 to match standard LangChain requirements
+            base_url="https://ai-gen.sundaebytestt.com/v1", 
             api_key="sk-59addf63a8bd464c92242421db666aa1",
             model="meta/llama-3.2-3b-instruct",
             max_tokens=150,
