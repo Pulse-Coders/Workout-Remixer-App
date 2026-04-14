@@ -1,4 +1,4 @@
-from fastapi import Request, HTTPException
+from fastapi import Request, HTTPException, status
 from pydantic import BaseModel
 from sqlmodel import select
 
@@ -28,7 +28,6 @@ async def list_users(request: Request, db: SessionDep):
     return user_service.get_all_users()
 
 # --- WORKOUTS & RPG LOGIC ---
-# 👇 THIS IS THE ROUTE THAT WENT MISSING!
 @api_router.get("/workouts")
 async def get_all_workouts(db: SessionDep):
     workouts = db.exec(select(Workout)).all()
@@ -76,7 +75,6 @@ async def ai_chat_endpoint(chat_msg: ChatMessage):
         
     except Exception as e:
         print(f"⚠️ AI Server Error: {e}")
-        # THE FALLBACK: If the server is dead, use this local mock bot!
         user_text = chat_msg.message.lower()
         if "chest" in user_text or "push" in user_text:
             return {"reply": "For a great chest workout, try combining Standard Push-ups with Dumbbell Bench Presses! Aim for 3 sets of 10."}

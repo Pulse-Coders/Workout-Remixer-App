@@ -32,7 +32,6 @@
     .main-content { flex-grow: 1; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
     
-    /* ADDED SMOOTH TRANSITIONS FOR WHEN CARDS ARE PROCESSING */
     .card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; flex-direction: column; overflow: hidden; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border: 1px solid #f0f0f0; position: relative;}
     .card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); border-color: #ddd;}
     .card-processing { opacity: 0.6; pointer-events: none; transform: scale(0.98); }
@@ -80,15 +79,12 @@
     .routine-list-item:last-child { border-bottom: none; }
     .routine-num { font-size: 20px; font-weight: 900; color: #ccc; }
 
-    .chatbot-btn { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: linear-gradient(135deg, #1a1a1a, #444); color: #fff; border-radius: 50%; border: none; cursor: pointer; z-index: 1000; box-shadow: 0 8px 24px rgba(0,0,0,0.2); font-size: 28px;}
-    .chatbot-window { position: fixed; bottom: 110px; right: 30px; width: 340px; height: 450px; background: #fff; border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.15); z-index: 1000; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #eee; }
-
     @media (max-width: 768px) {
-    .dashboard-container { flex-direction: column; }
-    .sidebar { width: 100%; height: auto; max-height: 400px; border-radius: 12px; }
-    .page-tabs { flex-wrap: wrap; }
-    .tab-btn { flex: 1 1 100%; justify-content: center; }
-}
+        .dashboard-container { flex-direction: column; }
+        .sidebar { width: 100%; height: auto; max-height: 400px; border-radius: 12px; }
+        .page-tabs { flex-wrap: wrap; }
+        .tab-btn { flex: 1 1 100%; justify-content: center; }
+    }
 </style>
 {% endblock %}
 
@@ -169,9 +165,11 @@
             </div>
 
             <div v-else class="grid">
-                <div :class="['card', isProcessing === workout.id ? 'card-processing' : '']" v-for="(workout, index) in filteredWorkouts" :key="index">
-                    <div class="card-image" :style="{ background: getGradient(workout.muscle_group) }">
-                        <span class="material-symbols-outlined">[[ getIcon(workout.muscle_group) ]]</span>
+                <div :class="['card', isProcessing === workout.id ? 'card-processing' : '']" v-for="workout in filteredWorkouts" :key="workout.id">
+                    <div class="card-image" :style="!workout.image_url ? { background: getGradient(workout.muscle_group) } : {}">
+                        <img v-if="workout.image_url" :src="workout.image_url" :alt="workout.name" style="width:100%; height:100%; object-fit:cover;">
+                        <span v-else class="material-symbols-outlined">[[ getIcon(workout.muscle_group) ]]</span>
+                        
                         <span class="card-tag">[[ workout.muscle_group ]]</span>
                         <button class="info-btn" @click="openExerciseModal(workout)">
                             <span class="material-symbols-outlined" style="font-size: 18px;">info</span>
@@ -328,8 +326,6 @@
         setup() {
             const activePage = ref('explore')
             const searchQuery = ref('')
-            
-            // NEW: Processing Lock
             const isProcessing = ref(null)
 
             const workouts = ref([])
@@ -338,6 +334,8 @@
             const isEditing = ref(null) 
             const activeExercise = ref(null)
             const activeRoutine = ref(null)
+            
+            // Merged setup defaults
             const selectedMuscles = ref([])
             const selectedDifficulty = ref("")
 
@@ -380,7 +378,6 @@
                 } catch (e) { showToast("Error", "Network error while seeding."); }
             }
 
-            // THE FIX: Added async locks (isProcessing) so spam clicking gets ignored!
             const evolveWorkout = async (id) => {
                 if (isProcessing.value) return; 
                 isProcessing.value = id; 
@@ -431,12 +428,14 @@
             }
             
             const deleteRoutine = (index) => { savedRoutines.value.splice(index, 1); showToast("Deleted", "Routine removed.");}
+            
             const copyRoutine = (routine) => {
-            let text = `🏋️ ${routine.name}\n`;
-            routine.exercises.forEach((ex, i) => text += `${i+1}. ${ex.name} (Tier ${ex.tier})\n`);
-            navigator.clipboard.writeText(text);
-            showToast("Copied!", "Routine copied to clipboard.");
-}
+                let text = `🏋️ ${routine.name}\n`;
+                routine.exercises.forEach((ex, i) => text += `${i+1}. ${ex.name} (Tier ${ex.tier})\n`);
+                navigator.clipboard.writeText(text);
+                showToast("Copied!", "Routine copied to clipboard.");
+            }
+
             const loadWorkouts = async () => { const res = await fetch('/api/workouts'); workouts.value = await res.json(); }
 
             const showToast = (title, msg) => {
@@ -474,7 +473,7 @@
                 currentRoutine, savedRoutines, isEditing, userLevel, userXp, xpProgress, xpToNextLevel, pendingXp, badges,
                 activeExercise, activeRoutine, openExerciseModal, openRoutineModal, seedDb, addToBuilder, removeFromBuilder, 
                 saveRoutine, editSavedRoutine, deleteRoutine, evolveWorkout, regressWorkout, getIcon, getGradient, getBadgeClass,
-                isProcessing // Returned so the HTML can use the lock
+                isProcessing, copyRoutine 
             }
         }
     }).mount('#vue-app')

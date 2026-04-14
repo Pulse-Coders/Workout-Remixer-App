@@ -12,11 +12,10 @@ class Workout(SQLModel, table=True):
     equipment: str   
     difficulty: str    
     instructions: str
-    
-    # --- PROGRESSION SYSTEM ---
-    progression_family: Optional[str] = Field(default=None)
-    tier: int = Field(default=1)
-    xp_reward: int = Field(default=50)
+    # --- ADDED RPG COLUMNS ---
+    progression_family: Optional[str] = Field(default=None) 
+    tier: int = Field(default=1) 
+    xp_reward: int = Field(default=50) 
     
     routines: List["Routine"] = Relationship(back_populates="workouts", link_model=RoutineWorkoutLink)
 
@@ -24,7 +23,5 @@ class Routine(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
     description: Optional[str] = None
-    
     user_id: int = Field(default=None, foreign_key="user.id") 
-    
     workouts: List[Workout] = Relationship(back_populates="routines", link_model=RoutineWorkoutLink)
