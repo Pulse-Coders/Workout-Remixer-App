@@ -13,6 +13,11 @@ class Workout(SQLModel, table=True):
     difficulty: str    
     instructions: str
     
+    # --- MISSING RPG COLUMNS ADDED ---
+    progression_family: Optional[str] = Field(default=None) 
+    tier: int = Field(default=1) 
+    xp_reward: int = Field(default=50) 
+    
     routines: List["Routine"] = Relationship(back_populates="workouts", link_model=RoutineWorkoutLink)
 
 class Routine(SQLModel, table=True):
