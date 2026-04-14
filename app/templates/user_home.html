@@ -45,38 +45,31 @@
             
             <div class="filter-group">
                 <h4>Muscle Group</h4>
-                <label><input type="checkbox" checked> Chest</label>
-                <label><input type="checkbox"> Back</label>
-                <label><input type="checkbox"> Legs</label>
-                <label><input type="checkbox"> Shoulders</label>
+                <label><input type="checkbox" value="Chest" v-model="selectedMuscles"> Chest</label>
+                <label><input type="checkbox" value="Back" v-model="selectedMuscles"> Back</label>
+                <label><input type="checkbox" value="Legs" v-model="selectedMuscles"> Legs</label>
+                <label><input type="checkbox" value="Shoulders" v-model="selectedMuscles"> Shoulders</label>
             </div>
 
             <div class="filter-group">
                 <h4>Difficulty</h4>
-                <label><input type="radio" name="diff"> Beginner</label>
-                <label><input type="radio" name="diff"> Intermediate</label>
-                <label><input type="radio" name="diff"> Advanced</label>
+                <label><input type="radio" value="" v-model="selectedDifficulty"> All</label>
+                <label><input type="radio" value="Beginner" v-model="selectedDifficulty"> Beginner</label>
+                <label><input type="radio" value="Intermediate" v-model="selectedDifficulty"> Intermediate</label>
+                <label><input type="radio" value="Advanced" v-model="selectedDifficulty"> Advanced</label>
             </div>
 
             <div class="filter-group">
                 <h4>Equipment</h4>
-                <label><input type="checkbox" checked> Dumbbells</label>
-                <label><input type="checkbox"> Kettlebells</label>
-                <label><input type="checkbox"> Barbell</label>
-                <label><input type="checkbox"> Bodyweight</label>
-            </div>
-
-            <div class="filter-group">
-                <h4>Duration</h4>
-                <label><input type="radio" name="dur"> < 30 mins</label>
-                <label><input type="radio" name="dur"> 30-60 mins</label>
-                <label><input type="radio" name="dur"> 60+ mins</label>
+                <label><input type="checkbox" value="Dumbbells" v-model="selectedEquipment"> Dumbbells</label>
+                <label><input type="checkbox" value="Barbell" v-model="selectedEquipment"> Barbell</label>
+                <label><input type="checkbox" value="Bodyweight" v-model="selectedEquipment"> Bodyweight</label>
             </div>
         </aside>
 
         <main class="main-content">
             <div class="grid">
-                <div class="card" v-for="(workout, index) in workouts" :key="workout.id">
+                <div class="card" v-for="workout in filteredWorkouts" :key="workout.id">
                     <div class="card-image">
                         <span class="card-tag">#[[ workout.muscle_group ]]</span>
                         Workout Preview
@@ -92,7 +85,7 @@
                         <p style="font-size: 13px; color: #666; margin: 0;">[[ workout.instructions ]]</p>
                     </div>
                     <div class="card-footer">
-                        <button class="btn-outline" @click="remixWorkout(index, workout.id)">🔀 Remix</button>
+                        <button class="btn-outline" @click="remixWorkout(workout.id)">🔀 Remix</button>
                         <button class="btn-fill">Start</button>
                     </div>
                 </div>
@@ -106,7 +99,7 @@
 
 {% block subpage_scripts %}
 <script>
-    const { createApp, ref, onMounted } = Vue
+    const { createApp, ref, onMounted, computed } = Vue
     
     createApp({
         compilerOptions: { delimiters: ["[[", "]]"] },
@@ -115,6 +108,19 @@
             const toggleChat = () => { isChatOpen.value = !isChatOpen.value }
 
             const workouts = ref([])
+            
+            const selectedMuscles = ref(["Chest", "Back", "Legs", "Shoulders"])
+            const selectedDifficulty = ref("")
+            const selectedEquipment = ref(["Dumbbells", "Barbell", "Bodyweight"])
+
+            const filteredWorkouts = computed(() => {
+                return workouts.value.filter(w => {
+                    const matchMuscle = selectedMuscles.value.length === 0 || selectedMuscles.value.includes(w.muscle_group);
+                    const matchDiff = selectedDifficulty.value === "" || w.difficulty === selectedDifficulty.value;
+                    const matchEquip = selectedEquipment.value.length === 0 || selectedEquipment.value.includes(w.equipment);
+                    return matchMuscle && matchDiff && matchEquip;
+                });
+            })
 
             const loadWorkouts = async () => {
                 try {
@@ -130,13 +136,17 @@
                 loadWorkouts();
             })
 
-            const remixWorkout = async (index, currentWorkoutId) => {
+            const remixWorkout = async (currentWorkoutId) => {
                 try {
                     const response = await fetch(`/api/remix/${currentWorkoutId}`);
                     if (!response.ok) throw new Error("Remix failed");
                     
                     const newWorkout = await response.json();
-                    workouts.value[index] = newWorkout;
+                    
+                    const mainIndex = workouts.value.findIndex(w => w.id === currentWorkoutId);
+                    if (mainIndex !== -1) {
+                        workouts.value[mainIndex] = newWorkout;
+                    }
                     
                 } catch (error) {
                     console.error("Error remixing:", error);
@@ -144,7 +154,10 @@
                 }
             }
 
-            return { isChatOpen, toggleChat, workouts, remixWorkout }
+            return { 
+                isChatOpen, toggleChat, workouts, remixWorkout,
+                selectedMuscles, selectedDifficulty, selectedEquipment, filteredWorkouts
+            }
         }
     }).mount('#vue-app')
 </script>
