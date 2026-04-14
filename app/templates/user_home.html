@@ -32,7 +32,6 @@
     .btn-outline:hover { background: #1a1a1a; color: #fff; }
     .btn-fill { flex: 1; padding: 10px; background: #1a1a1a; color: #fff; border: 2px solid #1a1a1a; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
 
-    /* Vue Chatbot remains the same */
     .chatbot-btn { position: fixed; bottom: 40px; right: 40px; width: 65px; height: 65px; background-color: #1a1a1a; color: #ffffff; border: none; border-radius: 50%; font-size: 28px; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; justify-content: center; align-items: center; z-index: 1000;}
 </style>
 {% endblock %}
@@ -46,76 +45,119 @@
             
             <div class="filter-group">
                 <h4>Muscle Group</h4>
-                <label><input type="checkbox" checked> Chest</label>
-                <label><input type="checkbox"> Back</label>
-                <label><input type="checkbox"> Legs</label>
-                <label><input type="checkbox"> Shoulders</label>
+                <label><input type="checkbox" value="Chest" v-model="selectedMuscles"> Chest</label>
+                <label><input type="checkbox" value="Back" v-model="selectedMuscles"> Back</label>
+                <label><input type="checkbox" value="Legs" v-model="selectedMuscles"> Legs</label>
+                <label><input type="checkbox" value="Shoulders" v-model="selectedMuscles"> Shoulders</label>
             </div>
 
             <div class="filter-group">
                 <h4>Difficulty</h4>
-                <label><input type="radio" name="diff"> Beginner</label>
-                <label><input type="radio" name="diff"> Intermediate</label>
-                <label><input type="radio" name="diff"> Advanced</label>
+                <label><input type="radio" value="" v-model="selectedDifficulty"> All</label>
+                <label><input type="radio" value="Beginner" v-model="selectedDifficulty"> Beginner</label>
+                <label><input type="radio" value="Intermediate" v-model="selectedDifficulty"> Intermediate</label>
+                <label><input type="radio" value="Advanced" v-model="selectedDifficulty"> Advanced</label>
             </div>
 
             <div class="filter-group">
                 <h4>Equipment</h4>
-                <label><input type="checkbox" checked> Dumbbells</label>
-                <label><input type="checkbox"> Kettlebells</label>
-                <label><input type="checkbox"> Barbell</label>
-                <label><input type="checkbox"> Bodyweight</label>
-            </div>
-
-            <div class="filter-group">
-                <h4>Duration</h4>
-                <label><input type="radio" name="dur"> < 30 mins</label>
-                <label><input type="radio" name="dur"> 30-60 mins</label>
-                <label><input type="radio" name="dur"> 60+ mins</label>
+                <label><input type="checkbox" value="Dumbbells" v-model="selectedEquipment"> Dumbbells</label>
+                <label><input type="checkbox" value="Barbell" v-model="selectedEquipment"> Barbell</label>
+                <label><input type="checkbox" value="Bodyweight" v-model="selectedEquipment"> Bodyweight</label>
             </div>
         </aside>
 
         <main class="main-content">
             <div class="grid">
-                {% for i in range(6) %}
-                <div class="card">
+                <div class="card" v-for="workout in filteredWorkouts" :key="workout.id">
                     <div class="card-image">
-                        <span class="card-tag">#PULL-DAY</span>
-                        Routine Preview
+                        <span class="card-tag">#[[ workout.muscle_group ]]</span>
+                        Workout Preview
                     </div>
                     <div class="card-content">
                         <div class="card-header-info">
-                            <h4 class="card-title">Hypertrophy A</h4>
+                            <h4 class="card-title">[[ workout.name ]]</h4>
                         </div>
                         <div class="card-meta">
-                            <span>⚡ Intermediate</span>
-                            <span>⏱️ 45 Min</span>
+                            <span>⚡ [[ workout.difficulty ]]</span>
+                            <span>🏋️ [[ workout.equipment ]]</span>
                         </div>
-                        <p style="font-size: 13px; color: #666; margin: 0;">Focuses on compound movements and high volume remix options.</p>
+                        <p style="font-size: 13px; color: #666; margin: 0;">[[ workout.instructions ]]</p>
                     </div>
                     <div class="card-footer">
-                        <button class="btn-outline">Remix</button>
+                        <button class="btn-outline" @click="remixWorkout(workout.id)">🔀 Remix</button>
                         <button class="btn-fill">Start</button>
                     </div>
                 </div>
-                {% endfor %}
             </div>
         </main>
     </div>
 
     <button class="chatbot-btn" @click="toggleChat">🤖</button>
-    </div>
+</div>
 {% endblock %}
 
 {% block subpage_scripts %}
 <script>
-    const { createApp, ref } = Vue
+    const { createApp, ref, onMounted, computed } = Vue
+    
     createApp({
         compilerOptions: { delimiters: ["[[", "]]"] },
         setup() {
             const isChatOpen = ref(false)
             const toggleChat = () => { isChatOpen.value = !isChatOpen.value }
-            return { isChatOpen, toggleChat }
+
+            const workouts = ref([])
+            
+            const selectedMuscles = ref(["Chest", "Back", "Legs", "Shoulders"])
+            const selectedDifficulty = ref("")
+            const selectedEquipment = ref(["Dumbbells", "Barbell", "Bodyweight"])
+
+            const filteredWorkouts = computed(() => {
+                return workouts.value.filter(w => {
+                    const matchMuscle = selectedMuscles.value.length === 0 || selectedMuscles.value.includes(w.muscle_group);
+                    const matchDiff = selectedDifficulty.value === "" || w.difficulty === selectedDifficulty.value;
+                    const matchEquip = selectedEquipment.value.length === 0 || selectedEquipment.value.includes(w.equipment);
+                    return matchMuscle && matchDiff && matchEquip;
+                });
+            })
+
+            const loadWorkouts = async () => {
+                try {
+                    const response = await fetch('/api/workouts');
+                    if (!response.ok) throw new Error("Failed to load workouts");
+                    workouts.value = await response.json();
+                } catch (error) {
+                    console.error("Error loading workouts:", error);
+                }
+            }
+
+            onMounted(() => {
+                loadWorkouts();
+            })
+
+            const remixWorkout = async (currentWorkoutId) => {
+                try {
+                    const response = await fetch(`/api/remix/${currentWorkoutId}`);
+                    if (!response.ok) throw new Error("Remix failed");
+                    
+                    const newWorkout = await response.json();
+                    
+                    const mainIndex = workouts.value.findIndex(w => w.id === currentWorkoutId);
+                    if (mainIndex !== -1) {
+                        workouts.value[mainIndex] = newWorkout;
+                    }
+                    
+                } catch (error) {
+                    console.error("Error remixing:", error);
+                    alert("Could not remix this exercise.");
+                }
+            }
+
+            return { 
+                isChatOpen, toggleChat, workouts, remixWorkout,
+                selectedMuscles, selectedDifficulty, selectedEquipment, filteredWorkouts
+            }
         }
     }).mount('#vue-app')
 </script>
