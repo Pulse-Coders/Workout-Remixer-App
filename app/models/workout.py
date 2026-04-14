@@ -12,7 +12,7 @@ class Workout(SQLModel, table=True):
     equipment: str   
     difficulty: str    
     instructions: str
-    # --- ADDED RPG COLUMNS ---
+    # --- ADD THESE RPG COLUMNS ---
     progression_family: Optional[str] = Field(default=None) 
     tier: int = Field(default=1) 
     xp_reward: int = Field(default=50) 

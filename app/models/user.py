@@ -7,7 +7,7 @@ class UserBase(SQLModel):
     email: EmailStr = Field(index=True, unique=True)
     password: str
     role: str = ""
-    # --- ADDED RPG COLUMNS ---
+    # --- ADD THESE RPG COLUMNS ---
     xp: int = Field(default=0)
     level: int = Field(default=1)
 

@@ -8,7 +8,6 @@ def seed_database():
     print("Building database tables...")
     SQLModel.metadata.create_all(engine)
     
-    # Safety check to prevent duplicate seeding
     with Session(engine) as session:
         existing = session.exec(select(Workout)).first()
         if existing:
@@ -51,7 +50,7 @@ def seed_database():
         except Exception as e:
             session.rollback()
             print(f"CRITICAL ERROR: {e}")
-            raise e # Forces the backend to properly report the failure!
+            raise e
 
 if __name__ == "__main__":
     seed_database()
