@@ -3,129 +3,317 @@
 
 {% block additional_styles %}
 <style>
+    body { background-color: #f4f7f6; }
+    
+    .page-tabs { display: flex; gap: 15px; margin: 20px 0; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;}
+    .tab-btn { padding: 10px 25px; border-radius: 30px; font-weight: 800; font-size: 14px; border: none; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px;}
+    .tab-active { background: #1a1a1a; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.15);}
+    .tab-inactive { background: transparent; color: #666; }
+    .tab-inactive:hover { background: #e0e0e0; color: #111; }
+
     .dashboard-container { display: flex; gap: 30px; }
-    .sidebar { width: 320px; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: calc(100vh - 120px); overflow-y: auto; flex-shrink: 0;}
-    .sidebar h3 { margin-top: 20px; color: #1a1a1a; font-weight: 800; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 15px;}
+    
+    .sidebar { width: 320px; background: #ffffff; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); height: calc(100vh - 180px); overflow-y: auto; flex-shrink: 0; border: 1px solid #eee;}
+    .sidebar h3 { margin-top: 20px; color: #111; font-weight: 800; border-bottom: 2px solid #f4f7f6; padding-bottom: 10px; margin-bottom: 15px; font-size: 18px;}
     .sidebar h3:first-child { margin-top: 0; }
     
-    .filter-group { margin-bottom: 15px; }
-    .filter-group h4 { margin-bottom: 8px; font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px;}
-    .filter-group label { display: block; margin-bottom: 5px; font-size: 14px; color: #333; cursor: pointer; }
+    .filter-group { margin-bottom: 20px; }
+    .filter-group h4 { margin-bottom: 12px; font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700;}
+    .filter-checkbox { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 14px; color: #444; cursor: pointer; transition: color 0.2s;}
     
+    .stats-widget { background: linear-gradient(135deg, #1a1a1a, #333); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px;}
+    .stats-header { display: flex; justify-content: space-between; align-items: flex-end;}
+    .stats-number { font-size: 28px; font-weight: 900; line-height: 1; }
+    .stats-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #aaa; margin-top: 4px; }
+    .xp-bar-container { width: 100%; height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; position: relative; }
+    .xp-bar-fill { height: 100%; background: linear-gradient(90deg, #38ef7d, #11998e); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    .xp-text { font-size: 10px; color: #ccc; text-align: right; font-weight: bold; margin-top: -5px;}
+
     .main-content { flex-grow: 1; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-    .card { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; transition: 0.2s;}
-    .card:hover { transform: translateY(-4px); }
     
-    .card-image { height: 140px; background-color: #1a1a1a; display: flex; align-items: center; justify-content: center; color: #fff; position: relative; }
-    .card-tag { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); color: #1a1a1a; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
-    .card-content { padding: 15px; }
-    .card-title { font-size: 16px; font-weight: 800; margin: 0; }
-    .card-meta { font-size: 11px; color: #888; margin-bottom: 10px; display: flex; gap: 8px; }
+    /* ADDED SMOOTH TRANSITIONS FOR WHEN CARDS ARE PROCESSING */
+    .card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; flex-direction: column; overflow: hidden; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border: 1px solid #f0f0f0; position: relative;}
+    .card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); border-color: #ddd;}
+    .card-processing { opacity: 0.6; pointer-events: none; transform: scale(0.98); }
     
-    .card-footer { display: flex; gap: 8px; padding: 0 15px 15px 15px; }
-    .btn-outline { flex: 1; padding: 8px; border: 2px solid #1a1a1a; background: transparent; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
-    .btn-fill { flex: 1; padding: 8px; background: #1a1a1a; color: #fff; border: 2px solid #1a1a1a; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
+    .card-image { height: 160px; display: flex; align-items: center; justify-content: center; position: relative; color: white; }
+    .card-image .material-symbols-outlined { font-size: 64px; opacity: 0.9; }
+    .card-tag { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,0.95); color: #111; padding: 6px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+    
+    .info-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.95); color: #111; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: 0.2s;}
+    .info-btn:hover { background: #111; color: #fff; }
 
-    /* Routine Builder & Saved Lists */
-    .routine-box { background: #fdfdfd; border: 2px dashed #ddd; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
-    .routine-item { background: #fff; padding: 8px 12px; border-radius: 6px; margin-bottom: 5px; display: flex; justify-content: space-between; border: 1px solid #eee; font-size: 12px; font-weight: 700; }
+    .card-content { padding: 20px; flex-grow: 1;}
+    .card-title { font-size: 18px; font-weight: 800; margin: 0 0 10px 0; color: #111; line-height: 1.3;}
+    .card-meta { font-size: 12px; color: #666; display: flex; gap: 10px; align-items: center;}
     
-    .saved-routine-card { background: #1a1a1a; color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
-    .saved-routine-card h5 { margin: 0; font-size: 14px; font-weight: 800; }
-    .saved-routine-card p { font-size: 11px; margin: 5px 0; color: #aaa; }
+    .badge { padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
+    .badge-tier { background: #111; color: #fff; }
+    .badge-xp { background: #e6f4ea; color: #1e8e3e; border: 1px solid #1e8e3e; }
+    .badge-beginner { background: #e6f4ea; color: #1e8e3e; }
+    .badge-intermediate { background: #fef7e0; color: #f29900; }
+    .badge-advanced { background: #fce8e6; color: #d93025; }
+
+    .card-footer { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 20px 20px; }
+    .btn-outline { flex: 1 1 45%; padding: 8px; border: 2px solid #e0e0e0; background: transparent; border-radius: 8px; font-weight: 700; font-size: 12px; color: #444; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .btn-outline:hover { border-color: #1a1a1a; color: #1a1a1a; background: #f9f9f9; }
+    .btn-fill { flex: 1 1 100%; padding: 10px; background: #1a1a1a; color: #fff; border: 2px solid #1a1a1a; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 5px;}
+    .btn-fill:hover { background: #333; }
+
+    .routine-box { background: #f8f9fa; border: 2px dashed #e0e0e0; border-radius: 12px; padding: 12px; margin-bottom: 15px; }
+    .routine-item { background: #fff; padding: 10px 15px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; font-size: 13px; font-weight: 700;}
     
-    /* Chatbot Styles */
-    .chatbot-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #1a1a1a; color: #fff; border-radius: 50%; border: none; cursor: pointer; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 24px;}
-    .chatbot-window { position: fixed; bottom: 100px; right: 30px; width: 320px; height: 400px; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 1000; display: flex; flex-direction: column; overflow: hidden; }
+    .large-routine-card { background: #fff; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; padding: 25px; transition: transform 0.2s;}
+    .large-routine-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.08);}
+    .routine-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f4f7f6; padding-bottom: 15px; margin-bottom: 15px;}
+    
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 2000; display: flex; justify-content: center; align-items: center; }
+    .custom-modal { background: #fff; border-radius: 20px; width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.25); position: relative; animation: slideUp 0.3s ease-out;}
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header { padding: 25px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa; border-radius: 20px 20px 0 0;}
+    .modal-header h2 { margin: 0; font-weight: 900; color: #111; font-size: 22px;}
+    .modal-close { background: none; border: none; cursor: pointer; color: #888; transition: 0.2s;}
+    .modal-body { padding: 30px; }
+    .instruction-text { font-size: 15px; line-height: 1.6; color: #444; margin-bottom: 20px;}
+    .routine-list-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-bottom: 1px solid #eee; }
+    .routine-list-item:last-child { border-bottom: none; }
+    .routine-num { font-size: 20px; font-weight: 900; color: #ccc; }
+
+    .chatbot-btn { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: linear-gradient(135deg, #1a1a1a, #444); color: #fff; border-radius: 50%; border: none; cursor: pointer; z-index: 1000; box-shadow: 0 8px 24px rgba(0,0,0,0.2); font-size: 28px;}
+    .chatbot-window { position: fixed; bottom: 110px; right: 30px; width: 340px; height: 450px; background: #fff; border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.15); z-index: 1000; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #eee; }
+
+    @media (max-width: 768px) {
+    .dashboard-container { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; max-height: 400px; border-radius: 12px; }
+    .page-tabs { flex-wrap: wrap; }
+    .tab-btn { flex: 1 1 100%; justify-content: center; }
+}
 </style>
 {% endblock %}
 
 {% block subpage_content %}
 <div id="vue-app">
-    <div class="dashboard-container">
-        
+    
+    <div class="page-tabs">
+        <button :class="['tab-btn', activePage === 'explore' ? 'tab-active' : 'tab-inactive']" @click="activePage = 'explore'">
+            <span class="material-symbols-outlined">travel_explore</span> Explore
+        </button>
+        <button :class="['tab-btn', activePage === 'routines' ? 'tab-active' : 'tab-inactive']" @click="activePage = 'routines'">
+            <span class="material-symbols-outlined">library_books</span> My Routines
+        </button>
+        <button :class="['tab-btn', activePage === 'profile' ? 'tab-active' : 'tab-inactive']" @click="activePage = 'profile'">
+            <span class="material-symbols-outlined">military_tech</span> Profile & Badges
+        </button>
+    </div>
+
+    <div v-if="activePage === 'explore'" class="dashboard-container">
         <aside class="sidebar">
+            <div class="stats-widget">
+                <div class="stats-header">
+                    <div>
+                        <div class="stats-number">Lvl [[ userLevel ]]</div>
+                        <div class="stats-label">Fitness Rank</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="stats-number">[[ userXp ]]</div>
+                        <div class="stats-label">Total XP</div>
+                    </div>
+                </div>
+                <div class="xp-bar-container">
+                    <div class="xp-bar-fill" :style="{ width: xpProgress + '%' }"></div>
+                </div>
+                <div class="xp-text">[[ xpToNextLevel ]] XP to next level</div>
+            </div>
+
             <h3>Refine</h3>
             <div class="filter-group">
                 <h4>Muscle Group</h4>
-                <label v-for="m in ['Chest', 'Back', 'Legs', 'Shoulders']">
+                <label class="filter-checkbox" v-for="m in ['Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Core']">
                     <input type="checkbox" :value="m" v-model="selectedMuscles"> [[ m ]]
                 </label>
             </div>
             <div class="filter-group">
                 <h4>Difficulty</h4>
-                <label><input type="radio" value="" v-model="selectedDifficulty"> All Levels</label>
-                <label v-for="d in ['Beginner', 'Intermediate', 'Advanced']">
+                <label class="filter-checkbox"><input type="radio" value="" v-model="selectedDifficulty"> All Levels</label>
+                <label class="filter-checkbox" v-for="d in ['Beginner', 'Intermediate', 'Advanced']">
                     <input type="radio" :value="d" v-model="selectedDifficulty"> [[ d ]]
                 </label>
             </div>
 
             <h3>Current Builder</h3>
             <div class="routine-box">
-                <div v-if="currentRoutine.length === 0" class="text-center py-3 text-muted small">
-                    Click "Start" on a workout to add it here.
+                <div v-if="currentRoutine.length === 0" class="text-center py-4 text-muted small">
+                    <span class="material-symbols-outlined" style="font-size: 32px; color: #ccc; display: block; margin-bottom: 10px;">fitness_center</span>
+                    Your routine is empty.<br>Start adding exercises!
                 </div>
                 <div v-for="(item, idx) in currentRoutine" :key="idx" class="routine-item">
-                    [[ item.name ]]
-                    <span class="text-danger" style="cursor:pointer" @click="removeFromBuilder(idx)">✖</span>
+                    <span>[[ item.name ]]</span>
+                    <span class="material-symbols-outlined text-danger" style="cursor:pointer; font-size: 18px;" @click="removeFromBuilder(idx)">close</span>
                 </div>
             </div>
-            <button v-if="currentRoutine.length > 0" class="btn-fill w-100" @click="saveRoutine">
-                [[ isEditing !== null ? 'Update Routine' : 'Create Routine' ]]
+            
+            <div style="text-align: center; margin-bottom: 5px; font-size: 12px; font-weight: bold; color: #1e8e3e;" v-if="currentRoutine.length > 0">
+                +[[ pendingXp ]] XP on Completion
+            </div>
+            <button v-if="currentRoutine.length > 0" class="btn-fill w-100" @click="saveRoutine" style="padding: 12px;">
+                [[ isEditing !== null ? '💾 Update Routine' : '➕ Save Routine & Claim XP' ]]
             </button>
-
-            <h3>Saved Routines</h3>
-            <div v-if="savedRoutines.length === 0" class="text-muted small">No saved routines yet.</div>
-            <div v-for="(routine, index) in savedRoutines" :key="index" class="saved-routine-card">
-                <div class="d-flex justify-content-between">
-                    <h5>[[ routine.name ]]</h5>
-                    <div>
-                        <span style="cursor:pointer; margin-right: 10px;" @click="editSavedRoutine(index)">✏️</span>
-                        <span style="cursor:pointer; color: #ff4444;" @click="deleteRoutine(index)">🗑️</span>
-                    </div>
-                </div>
-                <p>[[ routine.exercises.length ]] exercises • [[ routine.date ]]</p>
-            </div>
         </aside>
 
         <main class="main-content">
-            <div class="grid">
-                <div class="card" v-for="workout in filteredWorkouts" :key="workout.id">
-                    <div class="card-image">
-                        <span class="card-tag">#[[ workout.muscle_group ]]</span>
-                        [[ workout.name.charAt(0) ]]
+            <div v-if="workouts.length === 0" class="card" style="padding: 60px 40px; text-align: center; align-items: center; justify-content: center; background: #fff; border: 2px dashed #ddd;">
+                <span class="material-symbols-outlined" style="font-size: 64px; color: #aaa; margin-bottom: 20px;">database</span>
+                <h3 style="margin-bottom: 10px; font-weight: 800;">Database is Empty</h3>
+                <button class="btn-fill" @click="seedDb" style="padding: 15px 30px; font-size: 16px; border-radius: 30px; margin-top: 20px;">🌱 Seed Database</button>
+            </div>
+
+            <div v-else class="grid">
+                <div :class="['card', isProcessing === workout.id ? 'card-processing' : '']" v-for="(workout, index) in filteredWorkouts" :key="index">
+                    <div class="card-image" :style="{ background: getGradient(workout.muscle_group) }">
+                        <span class="material-symbols-outlined">[[ getIcon(workout.muscle_group) ]]</span>
+                        <span class="card-tag">[[ workout.muscle_group ]]</span>
+                        <button class="info-btn" @click="openExerciseModal(workout)">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">info</span>
+                        </button>
                     </div>
+                    
                     <div class="card-content">
                         <h4 class="card-title">[[ workout.name ]]</h4>
                         <div class="card-meta">
-                            <span>⚡ [[ workout.difficulty ]]</span>
-                            <span>🏋️ [[ workout.equipment ]]</span>
+                            <span class="badge badge-tier">Tier [[ workout.tier || 1 ]]</span>
+                            <span class="badge badge-xp">+[[ workout.xp_reward || 50 ]] XP</span>
                         </div>
                     </div>
+                    
                     <div class="card-footer">
-                        <button class="btn-outline" @click="remixWorkout(workout.id)">🔀 Remix</button>
-                        <button class="btn-fill" @click="addToBuilder(workout)">Start</button>
+                        <button class="btn-outline" @click="regressWorkout(workout.id)" :disabled="isProcessing !== null">
+                            <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: text-bottom;">keyboard_arrow_down</span> Simplify
+                        </button>
+                        <button class="btn-outline" @click="evolveWorkout(workout.id)" :disabled="isProcessing !== null">
+                            <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: text-bottom;">keyboard_arrow_up</span> Evolve
+                        </button>
+                        <button class="btn-fill" @click="addToBuilder(workout)" :disabled="isProcessing !== null">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">add</span> Add to Builder
+                        </button>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <button class="chatbot-btn" @click="toggleChat" v-if="!isChatOpen">🤖</button>
-    <div class="chatbot-window" v-if="isChatOpen">
-        <div class="bg-dark text-white p-3 d-flex justify-content-between">
-            <strong>FitBot</strong>
-            <span style="cursor:pointer" @click="toggleChat">✖</span>
+    <div v-if="activePage === 'routines'" class="routines-page">
+        <div v-if="savedRoutines.length === 0" style="text-align: center; padding: 100px 20px;">
+            <span class="material-symbols-outlined" style="font-size: 80px; color: #ddd; margin-bottom: 20px;">folder_off</span>
+            <h2 style="color: #666; font-weight: 800;">No Routines Saved</h2>
+            <p style="color: #888;">Go back to the Explore tab and build your first routine!</p>
+            <button class="btn-fill" style="margin: 20px auto; max-width: 200px;" @click="activePage = 'explore'">Explore Workouts</button>
         </div>
-        <div class="flex-grow-1 p-3 bg-light overflow-auto" id="chat-box">
-            <div v-for="m in chatMessages" :class="['p-2 mb-2 rounded shadow-sm', m.role === 'user' ? 'bg-dark text-white ms-auto' : 'bg-white text-dark']" style="max-width: 80%; font-size: 12px;">
-                [[ m.text ]]
+        
+        <div class="grid" v-else>
+            <div class="large-routine-card" v-for="(routine, index) in savedRoutines" :key="index">
+                <div class="routine-header">
+                    <div>
+                        <h3 style="margin: 0; font-weight: 900; color: #111; font-size: 20px;">[[ routine.name ]]</h3>
+                        <span style="font-size: 12px; color: #888;">Created on [[ routine.date ]]</span>
+                    </div>
+                    <div style="background: #e6f4ea; color: #1e8e3e; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 12px;">
+                        [[ routine.exercises.length ]] Exercises
+                    </div>
+                </div>
+                <div style="margin-bottom: 25px;">
+                    <div v-for="(ex, i) in routine.exercises.slice(0, 3)" :key="i" style="font-size: 13px; color: #555; padding: 5px 0; border-bottom: 1px solid #f4f4f4;">
+                        <span style="font-weight: bold; color: #111;">[[ i + 1 ]].</span> [[ ex.name ]]
+                    </div>
+                    <div v-if="routine.exercises.length > 3" style="font-size: 12px; color: #aaa; padding-top: 5px; font-style: italic;">
+                        + [[ routine.exercises.length - 3 ]] more...
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-fill" @click="openRoutineModal(routine)"><span class="material-symbols-outlined" style="font-size: 18px;">visibility</span> View</button>
+                    <button class="btn-outline" style="flex: 0; padding: 10px 15px;" @click="editSavedRoutine(index)" title="Edit"><span class="material-symbols-outlined" style="font-size: 18px;">edit</span></button>
+                    <button class="btn-outline" style="flex: 0; padding: 10px 15px; border-color: #fce8e6; color: #d93025;" @click="deleteRoutine(index)" title="Delete"><span class="material-symbols-outlined" style="font-size: 18px;">delete</span></button>
+                </div>
             </div>
         </div>
-        <div class="p-2 border-top d-flex">
-            <input type="text" class="form-control form-control-sm" v-model="newMsg" @keyup.enter="sendChat" placeholder="Ask a question...">
-            <button class="btn btn-dark btn-sm ms-2" @click="sendChat">Send</button>
+    </div>
+
+    <div v-if="activePage === 'profile'" class="profile-page">
+        <div class="card" style="padding: 50px; text-align: center; background: linear-gradient(135deg, #1a1a1a, #333); color: white; margin-bottom: 30px;">
+            <div style="font-size: 72px; margin-bottom: 10px;">🏆</div>
+            <h2 style="font-weight: 900; font-size: 32px; margin: 0;">Level [[ userLevel ]] Athlete</h2>
+            <p style="color: #ccc; font-size: 16px; margin-bottom: 25px;">[[ userXp ]] Total XP Earned</p>
+            <div class="xp-bar-container" style="max-width: 500px; margin: 0 auto; background: rgba(255,255,255,0.2); height: 12px; border-radius: 6px;">
+                <div class="xp-bar-fill" :style="{ width: xpProgress + '%' }"></div>
+            </div>
+            <div class="xp-text" style="max-width: 500px; margin: 8px auto 0; text-align: right; font-size: 12px;">[[ xpToNextLevel ]] XP to Level [[ userLevel + 1 ]]</div>
+        </div>
+        <h3 style="margin-bottom: 20px; font-weight: 800;">Achievements & Badges</h3>
+        <div class="grid">
+            <div class="card" v-for="badge in badges" :key="badge.name" :style="userLevel >= badge.level ? 'border: 2px solid #38ef7d;' : 'opacity: 0.6; filter: grayscale(100%);'">
+                <div class="card-content" style="text-align: center; padding: 30px;">
+                    <span class="material-symbols-outlined" style="font-size: 56px; color: #1a1a1a; margin-bottom: 15px;">[[ badge.icon ]]</span>
+                    <h4 style="margin: 0; font-weight: 800; font-size: 18px;">[[ badge.name ]]</h4>
+                    <p style="font-size: 13px; color: #666; margin-top: 8px;">[[ badge.desc ]]</p>
+                    <div style="margin-top: 20px; font-size: 12px; font-weight: bold; padding: 8px; border-radius: 6px;" :style="userLevel >= badge.level ? 'background: #e6f4ea; color: #1e8e3e;' : 'background: #eee; color: #888;'">
+                        [[ userLevel >= badge.level ? '🏅 UNLOCKED' : 'Unlocks at Level ' + badge.level ]]
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" v-if="activeExercise" @click.self="activeExercise = null">
+        <div class="custom-modal">
+            <div class="modal-header">
+                <h2>[[ activeExercise.name ]]</h2>
+                <button class="modal-close" @click="activeExercise = null"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <span class="badge badge-tier">Tier [[ activeExercise.tier || 1 ]]</span>
+                    <span class="badge" style="background: #eee; color: #333;">[[ activeExercise.muscle_group ]]</span>
+                </div>
+                <h4 style="margin-bottom: 10px; font-weight: 800; font-size: 14px; text-transform: uppercase; color: #888;">Instructions</h4>
+                <p class="instruction-text">[[ activeExercise.instructions || 'No instructions.' ]]</p>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #1a1a1a;">
+                    <strong>Reward:</strong> Completing this exercise grants +[[ activeExercise.xp_reward || 50 ]] XP towards your next Fitness Rank.
+                </div>
+                <button class="btn-fill w-100" style="margin-top: 25px; padding: 15px;" @click="addToBuilder(activeExercise); activeExercise = null;">Add to Builder</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" v-if="activeRoutine" @click.self="activeRoutine = null">
+        <div class="custom-modal">
+            <div class="modal-header">
+                <div>
+                    <h2>[[ activeRoutine.name ]]</h2>
+                    <span style="font-size: 13px; color: #888;">Created on [[ activeRoutine.date ]]</span>
+                </div>
+                <button class="modal-close" @click="activeRoutine = null"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <div style="padding: 20px 30px; background: #fdfdfd; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
+                    <strong>Total Exercises: [[ activeRoutine.exercises.length ]]</strong>
+                    <strong style="color: #1a73e8;">Est. Time: [[ activeRoutine.exercises.length * 5 ]] mins</strong>
+                </div>
+                <div class="routine-list-item" v-for="(ex, i) in activeRoutine.exercises" :key="i">
+                    <span class="routine-num">[[ i + 1 ]]</span>
+                    <div>
+                        <div style="font-weight: 800; font-size: 16px;">[[ ex.name ]]</div>
+                        <div style="font-size: 12px; color: #888; margin-top: 4px;">[[ ex.muscle_group ]] • Tier [[ ex.tier || 1 ]]</div>
+                    </div>
+                </div>
+                <div style="padding: 30px;">
+                    <div style="padding: 30px; display: flex; gap: 10px;">
+                        <button class="btn-outline" style="flex: 1; padding: 15px; border-color: #1a73e8; color: #1a73e8;" @click="copyRoutine(activeRoutine)">
+                            <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: text-bottom;">content_copy</span> Copy
+                        </button>
+                        <button class="btn-fill" style="flex: 2; padding: 15px;" @click="activeRoutine = null">Close Viewer</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -133,122 +321,160 @@
 
 {% block subpage_scripts %}
 <script>
-    const { createApp, ref, onMounted, computed, nextTick } = Vue
+    const { createApp, ref, onMounted, computed, nextTick, watch } = Vue
     
     createApp({
         compilerOptions: { delimiters: ["[[", "]]"] },
         setup() {
-            // --- DATA ---
+            const activePage = ref('explore')
+            const searchQuery = ref('')
+            
+            // NEW: Processing Lock
+            const isProcessing = ref(null)
+
             const workouts = ref([])
             const currentRoutine = ref([])
             const savedRoutines = ref([])
-            const isEditing = ref(null) // Tracks index of routine being edited
-            
-            const selectedMuscles = ref(["Chest", "Back", "Legs", "Shoulders"])
+            const isEditing = ref(null) 
+            const activeExercise = ref(null)
+            const activeRoutine = ref(null)
+            const selectedMuscles = ref([])
             const selectedDifficulty = ref("")
 
-            // --- FILTERING (Req #1) ---
+            const userLevel = ref(1)
+            const userXp = ref(0)
+            const xpPerLevel = 500
+            
+            const badges = ref([
+                { name: 'Novice Lifter', icon: 'egg', level: 1, desc: 'Began your fitness journey.' },
+                { name: 'Iron Bender', icon: 'fitness_center', level: 2, desc: 'Reached Level 2.' },
+                { name: 'Sweat Scholar', icon: 'local_fire_department', level: 3, desc: 'Reached Level 3.' },
+                { name: 'Beast Mode', icon: 'sports_martial_arts', level: 4, desc: 'Reached Level 4.' },
+                { name: 'Gym Deity', icon: 'bolt', level: 5, desc: 'Reached Level 5.' }
+            ]);
+
+            const xpProgress = computed(() => ((userXp.value % xpPerLevel) / xpPerLevel) * 100);
+            const xpToNextLevel = computed(() => xpPerLevel - (userXp.value % xpPerLevel));
+            const pendingXp = computed(() => currentRoutine.value.reduce((sum, w) => sum + (w.xp_reward || 50), 0));
+
             const filteredWorkouts = computed(() => {
                 return workouts.value.filter(w => {
                     const mMatch = selectedMuscles.value.length === 0 || selectedMuscles.value.includes(w.muscle_group);
                     const dMatch = selectedDifficulty.value === "" || w.difficulty === selectedDifficulty.value;
-                    return mMatch && dMatch;
+                    const sMatch = searchQuery.value === "" || w.name.toLowerCase().includes(searchQuery.value) || w.muscle_group.toLowerCase().includes(searchQuery.value);
+                    return mMatch && dMatch && sMatch;
                 });
             })
 
-            // --- ROUTINE ACTIONS (Req #2, #3, #4) ---
-            const addToBuilder = (workout) => {
-                currentRoutine.value.push({...workout});
-                showToast("Added", `${workout.name} added to builder.`);
+            const getIcon = (m) => ({ 'Chest': 'fitness_center', 'Back': 'rowing', 'Legs': 'directions_run', 'Shoulders': 'sports_martial_arts', 'Arms': 'sports_gymnastics', 'Core': 'accessibility_new' }[m] || 'exercise');
+            const getGradient = (m) => ({ 'Chest': 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', 'Back': 'linear-gradient(135deg, #4776E6 0%, #8E54E9 100%)', 'Legs': 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', 'Shoulders': 'linear-gradient(135deg, #F2994A 0%, #F2C94C 100%)', 'Arms': 'linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%)', 'Core': 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }[m] || 'linear-gradient(135deg, #1a1a1a, #444)');
+            const getBadgeClass = (d) => d === 'Beginner' ? 'badge-beginner' : d === 'Intermediate' ? 'badge-intermediate' : 'badge-advanced';
+
+            const openExerciseModal = (w) => activeExercise.value = w;
+            const openRoutineModal = (r) => activeRoutine.value = r;
+
+            const seedDb = async () => {
+                try {
+                    const res = await fetch('/api/trigger-seed');
+                    if (res.ok) { showToast("Success", "Database populated successfully!"); await loadWorkouts(); }
+                } catch (e) { showToast("Error", "Network error while seeding."); }
             }
 
-            const removeFromBuilder = (idx) => {
-                currentRoutine.value.splice(idx, 1);
+            // THE FIX: Added async locks (isProcessing) so spam clicking gets ignored!
+            const evolveWorkout = async (id) => {
+                if (isProcessing.value) return; 
+                isProcessing.value = id; 
+                try {
+                    const res = await fetch(`/api/evolve/${id}`);
+                    const data = await res.json();
+                    const idx = workouts.value.findIndex(w => w.id === id);
+                    if (idx !== -1) {
+                        if(workouts.value[idx].name === data.name) showToast("Max Level", "This exercise is already at the highest tier!");
+                        else { workouts.value[idx] = data; showToast("Evolved! 🔼", "Exercise increased in difficulty."); }
+                    }
+                } finally { isProcessing.value = null; }
             }
+
+            const regressWorkout = async (id) => {
+                if (isProcessing.value) return;
+                isProcessing.value = id;
+                try {
+                    const res = await fetch(`/api/regress/${id}`);
+                    const data = await res.json();
+                    const idx = workouts.value.findIndex(w => w.id === id);
+                    if (idx !== -1) {
+                        if(workouts.value[idx].name === data.name) showToast("Base Level", "This is the easiest variation.");
+                        else { workouts.value[idx] = data; showToast("Simplified! 🔽", "Exercise dropped down a tier."); }
+                    }
+                } finally { isProcessing.value = null; }
+            }
+
+            const addToBuilder = (workout) => { currentRoutine.value.push({...workout}); showToast("Added", `${workout.name} added to builder.`); }
+            const removeFromBuilder = (idx) => { currentRoutine.value.splice(idx, 1); }
 
             const saveRoutine = () => {
-                const routineData = {
-                    name: `Routine #${savedRoutines.value.length + 1}`,
-                    date: new Date().toLocaleDateString(),
-                    exercises: [...currentRoutine.value]
-                };
-
-                if (isEditing.value !== null) {
-                    savedRoutines.value[isEditing.value] = routineData;
-                    isEditing.value = null;
-                    showToast("Updated", "Routine has been updated.");
-                } else {
-                    savedRoutines.value.push(routineData);
-                    showToast("Created", "Routine saved to your list.");
-                }
+                const routineData = { name: `Routine #${savedRoutines.value.length + 1}`, date: new Date().toLocaleDateString(), exercises: [...currentRoutine.value] };
+                const gained = pendingXp.value;
+                userXp.value += gained;
+                
+                if (isEditing.value !== null) { savedRoutines.value[isEditing.value] = routineData; isEditing.value = null; } 
+                else { savedRoutines.value.push(routineData); }
                 currentRoutine.value = [];
+                activePage.value = 'routines';
             }
 
             const editSavedRoutine = (index) => {
-                // Load saved routine back into the active builder for editing
                 currentRoutine.value = [...savedRoutines.value[index].exercises];
                 isEditing.value = index;
+                activePage.value = 'explore';
                 showToast("Editing", "Loaded routine into builder.");
             }
+            
+            const deleteRoutine = (index) => { savedRoutines.value.splice(index, 1); showToast("Deleted", "Routine removed.");}
+            const copyRoutine = (routine) => {
+            let text = `🏋️ ${routine.name}\n`;
+            routine.exercises.forEach((ex, i) => text += `${i+1}. ${ex.name} (Tier ${ex.tier})\n`);
+            navigator.clipboard.writeText(text);
+            showToast("Copied!", "Routine copied to clipboard.");
+}
+            const loadWorkouts = async () => { const res = await fetch('/api/workouts'); workouts.value = await res.json(); }
 
-            const deleteRoutine = (index) => {
-                savedRoutines.value.splice(index, 1);
-                showToast("Deleted", "Routine removed.");
-            }
-
-            // --- API ACTIONS ---
-            const loadWorkouts = async () => {
-                const res = await fetch('/api/workouts');
-                workouts.value = await res.json();
-            }
-
-            const remixWorkout = async (id) => {
-                const res = await fetch(`/api/remix/${id}`);
-                const data = await res.json();
-                const idx = workouts.value.findIndex(w => w.id === id);
-                if (idx !== -1) workouts.value[idx] = data;
-                showToast("Remixed", "Found a similar exercise!");
-            }
-
-            // --- UTILS ---
             const showToast = (title, msg) => {
                 const tEl = document.getElementById('appToast');
-                if (tEl) {
-                    document.getElementById('toastTitle').innerText = title;
-                    document.getElementById('toastContent').innerText = msg;
-                    new bootstrap.Toast(tEl).show();
+                if (tEl) { document.getElementById('toastTitle').innerText = title; document.getElementById('toastContent').innerText = msg; new bootstrap.Toast(tEl).show(); }
+            }
+
+            onMounted(async () => {
+                await loadWorkouts();
+                const searchInput = document.querySelector('.search-bar');
+                if(searchInput) {
+                    searchInput.addEventListener('input', (e) => { searchQuery.value = e.target.value.toLowerCase(); });
                 }
-            }
+                const savedRoutineData = localStorage.getItem('fitbot_routines');
+                if(savedRoutineData) savedRoutines.value = JSON.parse(savedRoutineData);
+                const savedXpData = localStorage.getItem('fitbot_xp');
+                if(savedXpData) {
+                    userXp.value = parseInt(savedXpData);
+                    userLevel.value = Math.floor(userXp.value / xpPerLevel) + 1;
+                }
+            })
 
-            // --- CHATBOT ---
-            const isChatOpen = ref(false)
-            const chatMessages = ref([{ role: 'bot', text: 'How can I help with your routine today?' }])
-            const newMsg = ref('')
-            const toggleChat = () => { isChatOpen.value = !isChatOpen.value }
-            const sendChat = async () => {
-                if (!newMsg.value.trim()) return;
-                chatMessages.value.push({ role: 'user', text: newMsg.value });
-                const userText = newMsg.value;
-                newMsg.value = '';
-                await nextTick();
-                document.getElementById('chat-box').scrollTop = 9999;
-
-                try {
-                    const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: userText }) });
-                    const data = await res.json();
-                    chatMessages.value.push({ role: 'bot', text: data.reply });
-                } catch (e) { chatMessages.value.push({ role: 'bot', text: 'Error connecting to AI.' }); }
-                await nextTick();
-                document.getElementById('chat-box').scrollTop = 9999;
-            }
-
-            onMounted(loadWorkouts)
+            watch(savedRoutines, (newVal) => { localStorage.setItem('fitbot_routines', JSON.stringify(newVal)); }, { deep: true });
+            watch(userXp, (newVal) => {
+                localStorage.setItem('fitbot_xp', newVal);
+                const newLevel = Math.floor(newVal / xpPerLevel) + 1;
+                if(newLevel > userLevel.value) {
+                    userLevel.value = newLevel;
+                    showToast("LEVEL UP! 🎉", `You unlocked a new badge on your Profile!`);
+                }
+            });
 
             return { 
-                workouts, filteredWorkouts, selectedMuscles, selectedDifficulty, 
-                currentRoutine, savedRoutines, isEditing,
-                addToBuilder, removeFromBuilder, saveRoutine, editSavedRoutine, deleteRoutine,
-                remixWorkout, isChatOpen, toggleChat, chatMessages, newMsg, sendChat 
+                activePage, workouts, filteredWorkouts, selectedMuscles, selectedDifficulty, 
+                currentRoutine, savedRoutines, isEditing, userLevel, userXp, xpProgress, xpToNextLevel, pendingXp, badges,
+                activeExercise, activeRoutine, openExerciseModal, openRoutineModal, seedDb, addToBuilder, removeFromBuilder, 
+                saveRoutine, editSavedRoutine, deleteRoutine, evolveWorkout, regressWorkout, getIcon, getGradient, getBadgeClass,
+                isProcessing // Returned so the HTML can use the lock
             }
         }
     }).mount('#vue-app')

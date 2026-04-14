@@ -1,24 +1,36 @@
 from sqlmodel import Session, select
 from app.models.workout import Workout
-import random
 
 class RemixService:
-    def __init__(self, session: Session):
-        self.session = session
+    def __init__(self, db: Session):
+        self.db = db
 
-    def get_remixed_workout(self, current_workout_id: int):
-        current_workout = self.session.get(Workout, current_workout_id)
+    def evolve_exercise(self, current_id: int):
+        current = self.db.get(Workout, current_id)
 
-        if not current_workout:
-            return None
+        if not current or not current.progression_family: 
+            return current
 
-        statement = select(Workout).where(
-            Workout.muscle_group == current_workout.muscle_group,
-            Workout.id != current_workout_id
-        )
-        alternatives = self.session.exec(statement).all()
+        evolved = self.db.exec(
+            select(Workout).where(
+                Workout.progression_family == current.progression_family,
+                Workout.tier == current.tier + 1
+            )
+        ).first()
 
-        if not alternatives:
-            return current_workout
-            
-        return random.choice(alternatives)
+        return evolved if evolved else current 
+
+    def regress_exercise(self, current_id: int):
+        current = self.db.get(Workout, current_id)
+        
+        if not current or not current.progression_family: 
+            return current
+
+        easier = self.db.exec(
+            select(Workout).where(
+                Workout.progression_family == current.progression_family,
+                Workout.tier == current.tier - 1
+            )
+        ).first()
+
+        return easier if easier else current
